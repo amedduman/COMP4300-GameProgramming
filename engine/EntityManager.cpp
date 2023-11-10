@@ -1,5 +1,6 @@
 #include "EntityManager.h"
 #include "Entity.h"
+#include <iostream>
 
 typedef std::vector<std::shared_ptr<Entity>> EntityVec;
 typedef std::map <std::string, EntityVec> EntityMap;
@@ -43,4 +44,9 @@ void EntityManager::Update()
 const EntityVec& EntityManager::GetEntities() const
 {
     return m_entities;
+}
+
+const EntityVec &EntityManager::GetEntities(const std::string &tag)
+{
+    return m_entityMap[tag];
 }

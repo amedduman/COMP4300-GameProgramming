@@ -10,7 +10,10 @@ public:
 private:
     EntityManager m_entityManager;
     sf::RenderWindow m_window;
+    std::shared_ptr<Entity> m_player;
 
-    void SpawnPlayer();
+    void SUserInput();
+    std::shared_ptr<Entity> SpawnPlayer();
     void SMovement();
+    void SRender();
 };
