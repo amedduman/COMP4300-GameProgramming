@@ -10,10 +10,10 @@ add_executable(COMP4300_GameProgramming main.cpp
         engine/EntityManager.h
         engine/Entity.cpp
         engine/Entity.h
-        engine/Components.cpp
         engine/Components.h
-        engine/Math/Vec2.cpp
-        engine/Math/Vec2.h)
+        engine/math/Vec2.cpp
+        engine/math/Vec2.h)
+
 
 find_package(SFML 2.5 COMPONENTS window graphics REQUIRED)
 target_link_libraries(COMP4300_GameProgramming sfml-window sfml-graphics)
