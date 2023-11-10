@@ -34,11 +34,6 @@ std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
 
 void GeoWarsGame::SUserInput()
 {
-    m_player->cInput->left = false;
-    m_player->cInput->right = false;
-    m_player->cInput->up = false;
-    m_player->cInput->down = false;
-
     sf::Event event;
     while (m_window.pollEvent(event))
     {
@@ -51,11 +46,9 @@ void GeoWarsGame::SUserInput()
             {
                 case sf::Keyboard::A:
                     m_player->cInput->left = true;
-                    printf("a");
                     break;
                 case sf::Keyboard::D:
                     m_player->cInput->right = true;
-                    printf("d");
                     break;
                 case sf::Keyboard::W:
                     m_player->cInput->up = true;
@@ -65,6 +58,28 @@ void GeoWarsGame::SUserInput()
                     break;
                 case sf::Keyboard::Escape:
                     m_window.close();
+                    break;
+                default:
+                    break;
+            }
+        }
+        if(event.type == sf::Event::KeyReleased)
+        {
+            switch (event.key.code)
+            {
+                case sf::Keyboard::A:
+                    m_player->cInput->left = false;
+                    break;
+                case sf::Keyboard::D:
+                    m_player->cInput->right = false;
+                    break;
+                case sf::Keyboard::W:
+                    m_player->cInput->up = false;
+                    break;
+                case sf::Keyboard::S:
+                    m_player->cInput->down = false;
+                    break;
+                default:
                     break;
             }
         }
@@ -77,11 +92,11 @@ void GeoWarsGame::SMovement()
     float speed = 8;
     if (m_player->cInput->right)
         m_player->cTransform->velocity.x = 1 * speed;
-    if (m_player->cInput->left)
+    else if (m_player->cInput->left)
         m_player->cTransform->velocity.x = -1 * speed;
     if (m_player->cInput->up)
         m_player->cTransform->velocity.y = -1 * speed;
-    if (m_player->cInput->down)
+    else if (m_player->cInput->down)
         m_player->cTransform->velocity.y = 1 * speed;
 
     for (auto& e : m_entityManager.GetEntities())
