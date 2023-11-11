@@ -1,6 +1,5 @@
 #include "GeoWarsGame.h"
 #include <random>
-#include <iostream>
 
 GeoWarsGame::GeoWarsGame()
     : m_entityManager(EntityManager()),
@@ -45,7 +44,6 @@ void GeoWarsGame::SpawnEnemy()
         GetRandomNumberInRange(radius, m_window.getSize().y - radius));
     const Vec2 vel(GetRandomNumberInRange(-5,5),
         GetRandomNumberInRange(-5,5));
-    // Vec2 vel(0,0);
     enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
     enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
 }
@@ -104,10 +102,10 @@ void GeoWarsGame::SUserInput()
     }
 }
 
-void GeoWarsGame::SMovement()
+void GeoWarsGame::SMovement() const
 {
     m_player->cTransform->velocity = Vec2(0,0);
-    float speed = 8;
+    constexpr float speed = 8;
     if (m_player->cInput->right)
         m_player->cTransform->velocity.x = 1 * speed;
     else if (m_player->cInput->left)
@@ -119,10 +117,6 @@ void GeoWarsGame::SMovement()
 
     for (auto& e : m_entityManager.GetEntities())
     {
-        // const Vec2 newPos(e->cTransform->pos.x + e->cTransform->velocity.x,
-        //             e->cTransform->pos.y + e->cTransform->velocity.y);
-        // std::cout << newPos.x << ", " << newPos.y << std::endl;
-
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
 
@@ -135,14 +129,6 @@ void GeoWarsGame::SMovement()
             e->cTransform->velocity.x *= -1;
         if(e->cTransform->pos.y >= m_window.getSize().y - e->cShape->circle.getRadius() || e->cTransform->pos.y <= e->cShape->circle.getRadius())
             e->cTransform->velocity.y *= -1;
-        // if(newPos.x + e->cShape->circle.getRadius() <= m_window.getSize().x && newPos.x > 0)
-        //     e->cShape->circle.setPosition(newPos.x, e->cTransform->pos.y);
-        // if (newPos.y + e->cShape->circle.getRadius() <= m_window.getSize().y && newPos.y > 0)
-        //     e->cShape->circle.setPosition(e->cTransform->pos.x, newPos.y);
-        // e->cTransform->pos.x += e->cTransform->velocity.x;
-        // e->cTransform->pos.y += e->cTransform->velocity.y;
-        // e->cShape->circle.setPosition(e->cTransform->pos.x,
-        //                               e->cTransform->pos.y);
     }
 }
 

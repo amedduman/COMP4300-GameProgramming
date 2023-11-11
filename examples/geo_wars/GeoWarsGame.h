@@ -16,7 +16,7 @@ private:
     void SUserInput();
     std::shared_ptr<Entity> SpawnPlayer();
     void SpawnEnemy();
-    void SMovement();
+    void SMovement() const;
     void SRender();
     int GetRandomNumberInRange(const int lower_bound, const int upper_bound);
 };
