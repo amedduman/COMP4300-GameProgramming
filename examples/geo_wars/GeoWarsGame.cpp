@@ -1,6 +1,6 @@
 #include "GeoWarsGame.h"
+#include <random>
 #include <iostream>
-
 
 GeoWarsGame::GeoWarsGame()
     : m_entityManager(EntityManager()),
@@ -13,6 +13,10 @@ void GeoWarsGame::Run()
 {
     m_window.setFramerateLimit(60);
     m_player =  SpawnPlayer();
+    for (int i = 0; i < 10; ++i)
+    {
+        SpawnEnemy();
+    }
 
     while (m_window.isOpen())
     {
@@ -27,9 +31,23 @@ std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
 {
     auto player = m_entityManager.AddEntity("player");
     player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(100,100), Vec2(1,1), 3));
-    player->cShape = std::make_shared<CShape>(CShape(32,12,sf::Color::Transparent,sf::Color::Red,3));
+    player->cShape = std::make_shared<CShape>(CShape(32,12,sf::Color::Transparent,sf::Color::White,3));
     player->cInput = std::make_shared<CInput>();
     return player;
+}
+
+void GeoWarsGame::SpawnEnemy()
+{
+    const auto enemy = m_entityManager.AddEntity("enemy");
+    constexpr float radius = 32;
+    const int points = GetRandomNumberInRange(3,8);
+    const Vec2 pos(GetRandomNumberInRange(radius, m_window.getSize().x - radius),
+        GetRandomNumberInRange(radius, m_window.getSize().y - radius));
+    const Vec2 vel(GetRandomNumberInRange(-5,5),
+        GetRandomNumberInRange(-5,5));
+    // Vec2 vel(0,0);
+    enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
+    enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
 }
 
 void GeoWarsGame::SUserInput()
@@ -101,10 +119,30 @@ void GeoWarsGame::SMovement()
 
     for (auto& e : m_entityManager.GetEntities())
     {
+        // const Vec2 newPos(e->cTransform->pos.x + e->cTransform->velocity.x,
+        //             e->cTransform->pos.y + e->cTransform->velocity.y);
+        // std::cout << newPos.x << ", " << newPos.y << std::endl;
+
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
-        e->cShape->circle.setPosition(e->cTransform->pos.x,
-                                      e->cTransform->pos.y);
+
+        e->cTransform->pos.x = std::clamp(static_cast<int>(e->cTransform->pos.x), static_cast<int>(e->cShape->circle.getRadius()), static_cast<int>(m_window.getSize().x - e->cShape->circle.getRadius()));
+        e->cTransform->pos.y = std::clamp(static_cast<int>(e->cTransform->pos.y), static_cast<int>(e->cShape->circle.getRadius()), static_cast<int>(m_window.getSize().y - e->cShape->circle.getRadius()));
+
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+
+        if(e->cTransform->pos.x >= m_window.getSize().x - e->cShape->circle.getRadius() || e->cTransform->pos.x <= e->cShape->circle.getRadius())
+            e->cTransform->velocity.x *= -1;
+        if(e->cTransform->pos.y >= m_window.getSize().y - e->cShape->circle.getRadius() || e->cTransform->pos.y <= e->cShape->circle.getRadius())
+            e->cTransform->velocity.y *= -1;
+        // if(newPos.x + e->cShape->circle.getRadius() <= m_window.getSize().x && newPos.x > 0)
+        //     e->cShape->circle.setPosition(newPos.x, e->cTransform->pos.y);
+        // if (newPos.y + e->cShape->circle.getRadius() <= m_window.getSize().y && newPos.y > 0)
+        //     e->cShape->circle.setPosition(e->cTransform->pos.x, newPos.y);
+        // e->cTransform->pos.x += e->cTransform->velocity.x;
+        // e->cTransform->pos.y += e->cTransform->velocity.y;
+        // e->cShape->circle.setPosition(e->cTransform->pos.x,
+        //                               e->cTransform->pos.y);
     }
 }
 
@@ -119,5 +157,16 @@ void GeoWarsGame::SRender()
         }
     }
     m_window.display();
+}
+
+int GeoWarsGame::GetRandomNumberInRange(const int lower_bound, const int upper_bound)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::uniform_int_distribution<int> distribution(lower_bound, upper_bound);
+
+    const int random_number = distribution(gen);
+    return random_number;
 }
 
