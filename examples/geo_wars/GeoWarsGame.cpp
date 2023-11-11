@@ -1,4 +1,5 @@
 #include "GeoWarsGame.h"
+#include <iostream>
 #include <random>
 
 GeoWarsGame::GeoWarsGame()
@@ -34,6 +35,20 @@ std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
     return player;
 }
 
+void GeoWarsGame::SpawnBullet(const int x, const int y)
+{
+    const auto bullet = m_entityManager.AddEntity("bullet");
+    constexpr float speed = 10;
+    Vec2 dir(0,0);
+    dir.x = x - m_player->cTransform->pos.x;
+    dir.y = y - m_player->cTransform->pos.y;
+    const float len = sqrt(dir.x * dir.x + dir.y * dir.y);
+    dir.x = dir.x / len * speed;
+    dir.y = dir.y / len * speed;
+    bullet->cTransform = std::make_shared<CTransform>(CTransform(m_player->cTransform->pos, dir, 0));
+    bullet->cShape = std::make_shared<CShape>(CShape(8,12,sf::Color::White,sf::Color::White,3));
+}
+
 void GeoWarsGame::SpawnEnemy()
 {
     const auto enemy = m_entityManager.AddEntity("enemy");
@@ -54,6 +69,14 @@ void GeoWarsGame::SUserInput()
     {
         if (event.type == sf::Event::Closed)
             m_window.close();
+
+        if(event.type == sf::Event::MouseButtonPressed)
+        {
+            if(event.mouseButton.button == sf::Mouse::Left)
+            {
+                SpawnBullet(event.mouseButton.x, event.mouseButton.y);
+            }
+        }
 
         if(event.type == sf::Event::KeyPressed)
         {

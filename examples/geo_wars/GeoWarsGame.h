@@ -18,6 +18,7 @@ private:
     void SUserInput();
     std::shared_ptr<Entity> SpawnPlayer();
     void SpawnEnemy();
+    void SpawnBullet(int x, int y);
     void SEnemySpawner();
     void SMovement() const;
     void SRender();
