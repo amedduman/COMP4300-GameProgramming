@@ -12,17 +12,16 @@ void GeoWarsGame::Run()
 {
     m_window.setFramerateLimit(60);
     m_player =  SpawnPlayer();
-    for (int i = 0; i < 10; ++i)
-    {
-        SpawnEnemy();
-    }
 
     while (m_window.isOpen())
     {
         m_entityManager.Update();
+        SEnemySpawner();
         SUserInput();
         SMovement();
         SRender();
+
+        m_currentFrame++;
     }
 }
 
@@ -99,6 +98,15 @@ void GeoWarsGame::SUserInput()
                     break;
             }
         }
+    }
+}
+
+void GeoWarsGame::SEnemySpawner()
+{
+    if (m_currentFrame - m_lastEnemySpawnedFrame > 60 * 3)
+    {
+        SpawnEnemy();
+        m_lastEnemySpawnedFrame = m_currentFrame;
     }
 }
 
