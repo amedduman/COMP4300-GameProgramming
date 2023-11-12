@@ -22,5 +22,11 @@ private:
     void SEnemySpawner();
     void SMovement() const;
     void SRender();
+    void SUpdateLifeSpan();
+
+    void SUpdateTransparencyBasedOnLifeSpan();
+
+    void SDestroyEntitiesThatReachedEndOfTheirLifeSpan();
+
     int GetRandomNumberInRange(const int lower_bound, const int upper_bound);
 };

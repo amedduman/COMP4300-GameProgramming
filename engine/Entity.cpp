@@ -6,20 +6,20 @@ Entity::Entity(size_t id, const std::string& tag)
 
 bool Entity::IsMarkedToBeDestroyedForNextFrame() const
 {
-    return false;
+    return m_isMarkedToBeDestroyedForNextFrame;
 }
 
 const std::string& Entity::Tag() const
 {
-    return "default";
+    return m_tag;
 }
 
-const size_t Entity::Id() const
+size_t Entity::Id() const
 {
-    return 0;
+    return m_id;
 }
 
 void Entity::Destroy()
 {
-
+    m_isMarkedToBeDestroyedForNextFrame = true;
 }

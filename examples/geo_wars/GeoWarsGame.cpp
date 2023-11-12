@@ -21,7 +21,9 @@ void GeoWarsGame::Run()
         SUserInput();
         SMovement();
         SRender();
-
+        SUpdateLifeSpan();
+        SUpdateTransparencyBasedOnLifeSpan();
+        SDestroyEntitiesThatReachedEndOfTheirLifeSpan();
         m_currentFrame++;
     }
 }
@@ -47,6 +49,7 @@ void GeoWarsGame::SpawnBullet(const int x, const int y)
     dir.y = dir.y / len * speed;
     bullet->cTransform = std::make_shared<CTransform>(CTransform(m_player->cTransform->pos, dir, 0));
     bullet->cShape = std::make_shared<CShape>(CShape(8,12,sf::Color::White,sf::Color::White,3));
+    bullet->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(50));
 }
 
 void GeoWarsGame::SpawnEnemy()
@@ -174,6 +177,64 @@ void GeoWarsGame::SRender()
         }
     }
     m_window.display();
+}
+
+void GeoWarsGame::SUpdateLifeSpan()
+{
+    for (auto& e: m_entityManager.GetEntities())
+    {
+        if (e->cLifeSpan)
+        {
+            e->cLifeSpan->remaining -= 1;
+
+            if (e->cLifeSpan->remaining <= 0)
+            {
+                    e->cLifeSpan->remaining = 0;
+            }
+        }
+    }
+}
+
+void GeoWarsGame::SUpdateTransparencyBasedOnLifeSpan()
+{
+    for(auto& e : m_entityManager.GetEntities())
+    {
+        if(e->cLifeSpan)
+        {
+            auto fCol = e->cShape->circle.getFillColor();
+            auto oCol = e->cShape->circle.getOutlineColor();
+
+            std::cout << "----------" << std::endl;
+
+            std::cout << "r: " << e->cLifeSpan->remaining << std::endl;
+            std::cout << "t: " << e->cLifeSpan->total << std::endl;
+
+            const float ratio = static_cast<float>(e->cLifeSpan->remaining) / static_cast<float>(e->cLifeSpan->total);
+            std::cout << "r/t: " << ratio << std::endl;
+
+            const float new_a = 255 * ratio;
+            std::cout << "n-a: " <<  static_cast<int>(new_a)  << std::endl;
+
+            fCol.a = static_cast<int>(new_a);
+            oCol.a = static_cast<int>(new_a);
+            e->cShape->circle.setFillColor(fCol);
+            e->cShape->circle.setOutlineColor(oCol);
+        }
+    }
+}
+
+void GeoWarsGame::SDestroyEntitiesThatReachedEndOfTheirLifeSpan()
+{
+    for (auto& e: m_entityManager.GetEntities())
+    {
+        if (e->cLifeSpan)
+        {
+            if(e->cLifeSpan->remaining <= 0)
+            {
+                e->Destroy();
+            }
+        }
+    }
 }
 
 int GeoWarsGame::GetRandomNumberInRange(const int lower_bound, const int upper_bound)

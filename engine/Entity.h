@@ -15,7 +15,7 @@ public:
 
     bool IsMarkedToBeDestroyedForNextFrame() const;
     const std::string & Tag() const;
-    const size_t Id() const;
+    size_t Id() const;
     void Destroy();
 
 private:
