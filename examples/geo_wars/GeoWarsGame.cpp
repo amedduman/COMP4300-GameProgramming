@@ -35,13 +35,14 @@ std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
     player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(100,100), Vec2(1,1), 3));
     player->cShape = std::make_shared<CShape>(CShape(32,12,sf::Color::Transparent,sf::Color::White,3));
     player->cInput = std::make_shared<CInput>();
+    player->cCollision = std::make_shared<CCollision>(32);
     return player;
 }
 
 void GeoWarsGame::SpawnBullet(const int x, const int y)
 {
     const auto bullet = m_entityManager.AddEntity("bullet");
-    constexpr float speed = 10;
+    constexpr float speed = 20;
     Vec2 dir(0,0);
     dir.x = x - m_player->cTransform->pos.x;
     dir.y = y - m_player->cTransform->pos.y;
@@ -51,7 +52,7 @@ void GeoWarsGame::SpawnBullet(const int x, const int y)
     bullet->cTransform = std::make_shared<CTransform>(CTransform(m_player->cTransform->pos, dir, 0));
     bullet->cShape = std::make_shared<CShape>(CShape(8,12,sf::Color::White,sf::Color::White,3));
     bullet->cCollision = std::make_shared<CCollision>(CCollision(8));
-    bullet->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(50));
+    bullet->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(25));
 }
 
 void GeoWarsGame::SpawnEnemy()
@@ -171,9 +172,43 @@ void GeoWarsGame::SMovement() const
 
 void GeoWarsGame::SCollision()
 {
-    for (auto& b : m_entityManager.GetEntities("bullet"))
+    // for (auto& b : m_entityManager.GetEntities("bullet"))
+    // {
+    //     for (auto& e : m_entityManager.GetEntities("enemy"))
+    //     {
+    //         const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
+    //         const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
+    //         if (len <= e->cCollision->radius + b->cCollision->radius)
+    //         {
+    //             e->Destroy();
+    //         }
+    //     }
+    // }
+
+
+
+    for (auto& e : m_entityManager.GetEntities("enemy"))
     {
-        for (auto& e : m_entityManager.GetEntities("enemy"))
+        const Vec2 diffP(e->cTransform->pos.x - m_player->cTransform->pos.x, e->cTransform->pos.y - m_player->cTransform->pos.y);
+        const float lenP = sqrt(diffP.x * diffP.x + diffP.y * diffP.y);
+        if (lenP <= e->cCollision->radius + m_player->cCollision->radius)
+        {
+            // m_player->Destroy();
+            m_player->cTransform->pos = Vec2(100, 100);
+            m_player->cTransform->velocity = Vec2(0, 0);
+
+            for(auto& enemy : m_entityManager.GetEntities("enemy"))
+            {
+                enemy->Destroy();
+            }
+
+            for(auto& bullet : m_entityManager.GetEntities("bullet"))
+            {
+                bullet->Destroy();
+            }
+        }
+
+        for (auto& b : m_entityManager.GetEntities("bullet"))
         {
             const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
             const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
