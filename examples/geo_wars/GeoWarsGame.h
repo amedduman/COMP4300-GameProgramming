@@ -21,6 +21,7 @@ private:
     void SpawnBullet(int x, int y);
     void SEnemySpawner();
     void SMovement() const;
+    void SCollision();
     void SRender();
     void SUpdateLifeSpan();
 
