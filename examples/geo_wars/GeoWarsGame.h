@@ -24,6 +24,7 @@ private:
     void SCollision();
     void SRender();
     void SUpdateLifeSpan();
+    void Restart();
 
     void SUpdateTransparencyBasedOnLifeSpan();
 

@@ -32,7 +32,7 @@ void GeoWarsGame::Run()
 std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
 {
     auto player = m_entityManager.AddEntity("player");
-    player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(100,100), Vec2(1,1), 3));
+    player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(m_window.getSize().x/2,m_window.getSize().y/2), Vec2(1,1), 3));
     player->cShape = std::make_shared<CShape>(CShape(32,12,sf::Color::Transparent,sf::Color::White,3));
     player->cInput = std::make_shared<CInput>();
     player->cCollision = std::make_shared<CCollision>(32);
@@ -67,6 +67,27 @@ void GeoWarsGame::SpawnEnemy()
     enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
     enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
     enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
+}
+
+void GeoWarsGame::Restart()
+{
+    m_player->cTransform->pos = Vec2(m_window.getSize().x/2, m_window.getSize().y / 2);
+    m_player->cTransform->velocity = Vec2(0, 0);
+
+    for(auto& enemy : m_entityManager.GetEntities("enemy"))
+    {
+        enemy->Destroy();
+    }
+
+    for(auto& bullet : m_entityManager.GetEntities("bullet"))
+    {
+        bullet->Destroy();
+    }
+
+    m_player->cInput->down = false;
+    m_player->cInput->up = false;
+    m_player->cInput->right = false;
+    m_player->cInput->left = false;
 }
 
 void GeoWarsGame::SUserInput()
@@ -172,40 +193,14 @@ void GeoWarsGame::SMovement() const
 
 void GeoWarsGame::SCollision()
 {
-    // for (auto& b : m_entityManager.GetEntities("bullet"))
-    // {
-    //     for (auto& e : m_entityManager.GetEntities("enemy"))
-    //     {
-    //         const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
-    //         const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
-    //         if (len <= e->cCollision->radius + b->cCollision->radius)
-    //         {
-    //             e->Destroy();
-    //         }
-    //     }
-    // }
-
-
-
     for (auto& e : m_entityManager.GetEntities("enemy"))
     {
         const Vec2 diffP(e->cTransform->pos.x - m_player->cTransform->pos.x, e->cTransform->pos.y - m_player->cTransform->pos.y);
         const float lenP = sqrt(diffP.x * diffP.x + diffP.y * diffP.y);
         if (lenP <= e->cCollision->radius + m_player->cCollision->radius)
         {
-            // m_player->Destroy();
-            m_player->cTransform->pos = Vec2(100, 100);
-            m_player->cTransform->velocity = Vec2(0, 0);
-
-            for(auto& enemy : m_entityManager.GetEntities("enemy"))
-            {
-                enemy->Destroy();
-            }
-
-            for(auto& bullet : m_entityManager.GetEntities("bullet"))
-            {
-                bullet->Destroy();
-            }
+            Restart();
+            break;
         }
 
         for (auto& b : m_entityManager.GetEntities("bullet"))
