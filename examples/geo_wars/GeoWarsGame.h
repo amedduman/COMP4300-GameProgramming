@@ -14,6 +14,7 @@ private:
     std::shared_ptr<Entity> m_player;
     int m_currentFrame = 0;
     int m_lastEnemySpawnedFrame = 0;
+    bool m_paused = false;
 
     void SUserInput();
     std::shared_ptr<Entity> SpawnPlayer();
@@ -21,6 +22,7 @@ private:
     void SpawnBullet(int x, int y);
     void SEnemySpawner();
     void SMovement() const;
+    void SRotate() const;
     void SCollision();
     void SRender();
     void SUpdateLifeSpan();
@@ -31,4 +33,5 @@ private:
     void SDestroyEntitiesThatReachedEndOfTheirLifeSpan();
 
     int GetRandomNumberInRange(const int lower_bound, const int upper_bound);
+
 };

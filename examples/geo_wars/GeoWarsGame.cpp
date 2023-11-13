@@ -17,14 +17,20 @@ void GeoWarsGame::Run()
     while (m_window.isOpen())
     {
         m_entityManager.Update();
-        SEnemySpawner();
         SUserInput();
-        SMovement();
-        SCollision();
+
+        if(!m_paused)
+        {
+            SEnemySpawner();
+            SMovement();
+            SRotate();
+            SCollision();
+            SUpdateLifeSpan();
+            SUpdateTransparencyBasedOnLifeSpan();
+            SDestroyEntitiesThatReachedEndOfTheirLifeSpan();
+        }
+
         SRender();
-        SUpdateLifeSpan();
-        SUpdateTransparencyBasedOnLifeSpan();
-        SDestroyEntitiesThatReachedEndOfTheirLifeSpan();
         m_currentFrame++;
     }
 }
@@ -125,6 +131,9 @@ void GeoWarsGame::SUserInput()
                 case sf::Keyboard::Escape:
                     m_window.close();
                     break;
+                case sf::Keyboard::P:
+                    m_paused = !m_paused;
+                    break;
                 default:
                     break;
             }
@@ -188,6 +197,14 @@ void GeoWarsGame::SMovement() const
             e->cTransform->velocity.x *= -1;
         if(e->cTransform->pos.y >= m_window.getSize().y - e->cShape->circle.getRadius() || e->cTransform->pos.y <= e->cShape->circle.getRadius())
             e->cTransform->velocity.y *= -1;
+    }
+}
+
+void GeoWarsGame::SRotate() const
+{
+    for(auto& e : m_entityManager.GetEntities())
+    {
+        e->cShape->circle.rotate(6);
     }
 }
 
