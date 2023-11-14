@@ -66,7 +66,7 @@ void GeoWarsGame::SpawnEnemy()
 {
     const auto enemy = m_entityManager.AddEntity("enemy");
     constexpr float radius = 32;
-    const int points = GetRandomNumberInRange(4,4);
+    const int points = GetRandomNumberInRange(3,8);
     const Vec2 pos(GetRandomNumberInRange(radius, m_window.getSize().x - radius),
         GetRandomNumberInRange(radius, m_window.getSize().y - radius));
     const Vec2 vel(GetRandomNumberInRange(-5,5),
@@ -190,18 +190,19 @@ void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
         Vec2 vel = Vec2(0, -1);
         Vec2 tmp = Vec2(0,0);
 
+        constexpr float speed = 5;
         const float radians = angle * i * (PI / 180.0f);
         tmp.x = cos(radians) * vel.x - sin(radians) * vel.y;
         tmp.y = sin(radians) * vel.x + cos(radians) * vel.y;
-        vel.x = tmp.x;
-        vel.y = tmp.y;
+        vel.x = tmp.x * speed;
+        vel.y = tmp.y * speed;
         // std::cout << "degree is " << angle * i  << "/ " << "radians is " << radians << ": " << cos(radians) + 1 << std::endl;
-        std::cout << vel.x << ", " << vel.y << std::endl;
+        // std::cout << vel.x << ", " << vel.y << std::endl;
 
         enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
         enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
         enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
-        enemy->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(50));
+        enemy->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(25));
     }
 }
 
