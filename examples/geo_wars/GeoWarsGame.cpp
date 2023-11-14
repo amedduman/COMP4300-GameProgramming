@@ -90,6 +90,11 @@ void GeoWarsGame::Restart()
         bullet->Destroy();
     }
 
+    for(auto& bullet : m_entityManager.GetEntities("small enemy"))
+    {
+        bullet->Destroy();
+    }
+
     m_player->cInput->down = false;
     m_player->cInput->up = false;
     m_player->cInput->right = false;
@@ -170,6 +175,23 @@ void GeoWarsGame::SEnemySpawner()
     }
 }
 
+void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
+{
+    for (int i = 0 ; i < e->cShape->circle.getPointCount(); i++)
+    {
+        const auto enemy = m_entityManager.AddEntity("small enemy");
+        constexpr float radius = 12;
+        const int points = static_cast<int>(e->cShape->circle.getPointCount());
+        const Vec2 pos = e->cTransform->pos;
+        const Vec2 vel(GetRandomNumberInRange(-5,5),
+            GetRandomNumberInRange(-5,5));
+        enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
+        enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
+        enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
+        enemy->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(50));
+    }
+}
+
 void GeoWarsGame::SMovement() const
 {
     m_player->cTransform->velocity = Vec2(0,0);
@@ -226,7 +248,31 @@ void GeoWarsGame::SCollision()
             const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
             if (len <= e->cCollision->radius + b->cCollision->radius)
             {
+                SpawnSmallEnemies(e);
+                b->Destroy();
                 e->Destroy();
+            }
+        }
+    }
+
+    for (auto& e : m_entityManager.GetEntities("small enemy"))
+    {
+        const Vec2 diffP(e->cTransform->pos.x - m_player->cTransform->pos.x, e->cTransform->pos.y - m_player->cTransform->pos.y);
+        const float lenP = sqrt(diffP.x * diffP.x + diffP.y * diffP.y);
+        if (lenP <= e->cCollision->radius + m_player->cCollision->radius)
+        {
+            Restart();
+            break;
+        }
+
+        for (auto& b : m_entityManager.GetEntities("bullet"))
+        {
+            const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
+            const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
+            if (len <= e->cCollision->radius + b->cCollision->radius)
+            {
+                if(b->IsMarkedToBeDestroyedForNextFrame() == false) // since we destroy the bullet that killed the original enemy we don't want our small enemies also die with same bullet.
+                    e->Destroy();
             }
         }
     }
