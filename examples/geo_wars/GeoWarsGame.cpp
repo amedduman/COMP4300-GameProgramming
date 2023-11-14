@@ -15,6 +15,15 @@ void GeoWarsGame::Run()
     m_window.setFramerateLimit(60);
     m_player =  SpawnPlayer();
 
+    sf::Font font;
+    if(!font.loadFromFile("../fonts/CotaneBeach.otf"))
+    {
+        std::cout << "couldn't load the font" << std::endl;
+        exit(-1);
+    }
+
+    m_text = sf::Text("000", font, 18);
+
     while (m_window.isOpen())
     {
         m_entityManager.Update();
@@ -78,6 +87,8 @@ void GeoWarsGame::SpawnEnemy()
 
 void GeoWarsGame::Restart()
 {
+    m_score = 0;
+
     m_player->cTransform->pos = Vec2(m_window.getSize().x/2, m_window.getSize().y / 2);
     m_player->cTransform->velocity = Vec2(0, 0);
 
@@ -262,6 +273,7 @@ void GeoWarsGame::SCollision()
             const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
             if (len <= e->cCollision->radius + b->cCollision->radius)
             {
+                m_score += e->cShape->circle.getPointCount() * 10;
                 SpawnSmallEnemies(e);
                 b->Destroy();
                 e->Destroy();
@@ -286,7 +298,10 @@ void GeoWarsGame::SCollision()
             if (len <= e->cCollision->radius + b->cCollision->radius)
             {
                 if(b->IsMarkedToBeDestroyedForNextFrame() == false) // since we destroy the bullet that killed the original enemy we don't want our small enemies also die with same bullet.
+                {
+                    m_score += e->cShape->circle.getPointCount() * 20;
                     e->Destroy();
+                }
             }
         }
     }
@@ -302,6 +317,8 @@ void GeoWarsGame::SRender()
             m_window.draw(e->cShape->circle);
         }
     }
+    m_text.setString(std::to_string(m_score));
+    m_window.draw(m_text);
     m_window.display();
 }
 

@@ -15,6 +15,8 @@ private:
     int m_currentFrame = 0;
     int m_lastEnemySpawnedFrame = 0;
     bool m_paused = false;
+    sf::Text m_text;
+    int m_score = 0;
 
     void SUserInput();
     std::shared_ptr<Entity> SpawnPlayer();
