@@ -1,6 +1,7 @@
 #include "GeoWarsGame.h"
 #include <iostream>
 #include <random>
+#include <cmath>
 
 GeoWarsGame::GeoWarsGame()
     : m_entityManager(EntityManager()),
@@ -65,7 +66,7 @@ void GeoWarsGame::SpawnEnemy()
 {
     const auto enemy = m_entityManager.AddEntity("enemy");
     constexpr float radius = 32;
-    const int points = GetRandomNumberInRange(3,8);
+    const int points = GetRandomNumberInRange(4,4);
     const Vec2 pos(GetRandomNumberInRange(radius, m_window.getSize().x - radius),
         GetRandomNumberInRange(radius, m_window.getSize().y - radius));
     const Vec2 vel(GetRandomNumberInRange(-5,5),
@@ -177,14 +178,26 @@ void GeoWarsGame::SEnemySpawner()
 
 void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
 {
+    const float angle = static_cast<float>(360) / static_cast<float>(e->cShape->circle.getPointCount());
+    constexpr float PI = 3.14159265f;
+
     for (int i = 0 ; i < e->cShape->circle.getPointCount(); i++)
     {
         const auto enemy = m_entityManager.AddEntity("small enemy");
         constexpr float radius = 12;
         const int points = static_cast<int>(e->cShape->circle.getPointCount());
         const Vec2 pos = e->cTransform->pos;
-        const Vec2 vel(GetRandomNumberInRange(-5,5),
-            GetRandomNumberInRange(-5,5));
+        Vec2 vel = Vec2(0, -1);
+        Vec2 tmp = Vec2(0,0);
+
+        const float radians = angle * i * (PI / 180.0f);
+        tmp.x = cos(radians) * vel.x - sin(radians) * vel.y;
+        tmp.y = sin(radians) * vel.x + cos(radians) * vel.y;
+        vel.x = tmp.x;
+        vel.y = tmp.y;
+        // std::cout << "degree is " << angle * i  << "/ " << "radians is " << radians << ": " << cos(radians) + 1 << std::endl;
+        std::cout << vel.x << ", " << vel.y << std::endl;
+
         enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
         enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
         enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
