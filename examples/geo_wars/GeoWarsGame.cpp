@@ -15,7 +15,7 @@ void GeoWarsGame::Run()
     m_player = SpawnPlayer();
 
     sf::Font font;
-    if (!font.loadFromFile("./fonts/CotaneBeach.otf"))
+    if (!font.loadFromFile("../fonts/CotaneBeach.otf"))
     {
         std::cout << "couldn't load the font" << std::endl;
         exit(-1);

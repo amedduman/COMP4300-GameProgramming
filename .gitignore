@@ -32,10 +32,6 @@
 *.app
 
 #added by me
-.idea
-cmake-build-debug
 bin
+build
 CMakeFiles
-CMakeCache.txt
-Makefile
-cmake_install.cmake
