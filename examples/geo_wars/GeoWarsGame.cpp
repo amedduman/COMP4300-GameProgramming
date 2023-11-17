@@ -7,16 +7,15 @@ GeoWarsGame::GeoWarsGame()
     : m_entityManager(EntityManager()),
       m_window(sf::VideoMode(800, 600), "GeoWars")
 {
-
 }
 
 void GeoWarsGame::Run()
 {
     m_window.setFramerateLimit(60);
-    m_player =  SpawnPlayer();
+    m_player = SpawnPlayer();
 
     sf::Font font;
-    if(!font.loadFromFile("../fonts/CotaneBeach.otf"))
+    if (!font.loadFromFile("./fonts/CotaneBeach.otf"))
     {
         std::cout << "couldn't load the font" << std::endl;
         exit(-1);
@@ -29,7 +28,7 @@ void GeoWarsGame::Run()
         m_entityManager.Update();
         SUserInput();
 
-        if(!m_paused)
+        if (!m_paused)
         {
             SEnemySpawner();
             SMovement();
@@ -48,8 +47,8 @@ void GeoWarsGame::Run()
 std::shared_ptr<Entity> GeoWarsGame::SpawnPlayer()
 {
     auto player = m_entityManager.AddEntity("player");
-    player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(m_window.getSize().x/2,m_window.getSize().y/2), Vec2(1,1), 3));
-    player->cShape = std::make_shared<CShape>(CShape(32,12,sf::Color::Transparent,sf::Color::White,3));
+    player->cTransform = std::make_shared<CTransform>(CTransform(Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2), Vec2(1, 1), 3));
+    player->cShape = std::make_shared<CShape>(CShape(32, 12, sf::Color::Transparent, sf::Color::White, 3));
     player->cInput = std::make_shared<CInput>();
     player->cCollision = std::make_shared<CCollision>(32);
     return player;
@@ -59,14 +58,14 @@ void GeoWarsGame::SpawnBullet(const int x, const int y)
 {
     const auto bullet = m_entityManager.AddEntity("bullet");
     constexpr float speed = 20;
-    Vec2 dir(0,0);
+    Vec2 dir(0, 0);
     dir.x = x - m_player->cTransform->pos.x;
     dir.y = y - m_player->cTransform->pos.y;
     const float len = sqrt(dir.x * dir.x + dir.y * dir.y);
     dir.x = dir.x / len * speed;
     dir.y = dir.y / len * speed;
     bullet->cTransform = std::make_shared<CTransform>(CTransform(m_player->cTransform->pos, dir, 0));
-    bullet->cShape = std::make_shared<CShape>(CShape(8,12,sf::Color::White,sf::Color::White,3));
+    bullet->cShape = std::make_shared<CShape>(CShape(8, 12, sf::Color::White, sf::Color::White, 3));
     bullet->cCollision = std::make_shared<CCollision>(CCollision(8));
     bullet->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(25));
 }
@@ -75,13 +74,13 @@ void GeoWarsGame::SpawnEnemy()
 {
     const auto enemy = m_entityManager.AddEntity("enemy");
     constexpr float radius = 32;
-    const int points = GetRandomNumberInRange(3,8);
+    const int points = GetRandomNumberInRange(3, 8);
     const Vec2 pos(GetRandomNumberInRange(radius, m_window.getSize().x - radius),
-        GetRandomNumberInRange(radius, m_window.getSize().y - radius));
-    const Vec2 vel(GetRandomNumberInRange(-5,5),
-        GetRandomNumberInRange(-5,5));
+                   GetRandomNumberInRange(radius, m_window.getSize().y - radius));
+    const Vec2 vel(GetRandomNumberInRange(-5, 5),
+                   GetRandomNumberInRange(-5, 5));
     enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
-    enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
+    enemy->cShape = std::make_shared<CShape>(CShape(radius, points, sf::Color::Transparent, sf::Color::Red, 3));
     enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
 }
 
@@ -89,20 +88,20 @@ void GeoWarsGame::Restart()
 {
     m_score = 0;
 
-    m_player->cTransform->pos = Vec2(m_window.getSize().x/2, m_window.getSize().y / 2);
+    m_player->cTransform->pos = Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2);
     m_player->cTransform->velocity = Vec2(0, 0);
 
-    for(auto& enemy : m_entityManager.GetEntities("enemy"))
+    for (auto &enemy : m_entityManager.GetEntities("enemy"))
     {
         enemy->Destroy();
     }
 
-    for(auto& bullet : m_entityManager.GetEntities("bullet"))
+    for (auto &bullet : m_entityManager.GetEntities("bullet"))
     {
         bullet->Destroy();
     }
 
-    for(auto& bullet : m_entityManager.GetEntities("small enemy"))
+    for (auto &bullet : m_entityManager.GetEntities("small enemy"))
     {
         bullet->Destroy();
     }
@@ -121,58 +120,58 @@ void GeoWarsGame::SUserInput()
         if (event.type == sf::Event::Closed)
             m_window.close();
 
-        if(event.type == sf::Event::MouseButtonPressed)
+        if (event.type == sf::Event::MouseButtonPressed)
         {
-            if(event.mouseButton.button == sf::Mouse::Left)
+            if (event.mouseButton.button == sf::Mouse::Left)
             {
                 SpawnBullet(event.mouseButton.x, event.mouseButton.y);
             }
         }
 
-        if(event.type == sf::Event::KeyPressed)
+        if (event.type == sf::Event::KeyPressed)
         {
             switch (event.key.code)
             {
-                case sf::Keyboard::A:
-                    m_player->cInput->left = true;
-                    break;
-                case sf::Keyboard::D:
-                    m_player->cInput->right = true;
-                    break;
-                case sf::Keyboard::W:
-                    m_player->cInput->up = true;
-                    break;
-                case sf::Keyboard::S:
-                    m_player->cInput->down = true;
-                    break;
-                case sf::Keyboard::Escape:
-                    m_window.close();
-                    break;
-                case sf::Keyboard::P:
-                    m_paused = !m_paused;
-                    break;
-                default:
-                    break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = true;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = true;
+                break;
+            case sf::Keyboard::W:
+                m_player->cInput->up = true;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = true;
+                break;
+            case sf::Keyboard::Escape:
+                m_window.close();
+                break;
+            case sf::Keyboard::P:
+                m_paused = !m_paused;
+                break;
+            default:
+                break;
             }
         }
-        if(event.type == sf::Event::KeyReleased)
+        if (event.type == sf::Event::KeyReleased)
         {
             switch (event.key.code)
             {
-                case sf::Keyboard::A:
-                    m_player->cInput->left = false;
-                    break;
-                case sf::Keyboard::D:
-                    m_player->cInput->right = false;
-                    break;
-                case sf::Keyboard::W:
-                    m_player->cInput->up = false;
-                    break;
-                case sf::Keyboard::S:
-                    m_player->cInput->down = false;
-                    break;
-                default:
-                    break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = false;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = false;
+                break;
+            case sf::Keyboard::W:
+                m_player->cInput->up = false;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = false;
+                break;
+            default:
+                break;
             }
         }
     }
@@ -187,19 +186,19 @@ void GeoWarsGame::SEnemySpawner()
     }
 }
 
-void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
+void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity> &e)
 {
     const float angle = static_cast<float>(360) / static_cast<float>(e->cShape->circle.getPointCount());
     constexpr float PI = 3.14159265f;
 
-    for (int i = 0 ; i < e->cShape->circle.getPointCount(); i++)
+    for (int i = 0; i < e->cShape->circle.getPointCount(); i++)
     {
         const auto enemy = m_entityManager.AddEntity("small enemy");
         constexpr float radius = 12;
         const int points = static_cast<int>(e->cShape->circle.getPointCount());
         const Vec2 pos = e->cTransform->pos;
         Vec2 vel = Vec2(0, -1);
-        Vec2 tmp = Vec2(0,0);
+        Vec2 tmp = Vec2(0, 0);
 
         constexpr float speed = 5;
         const float radians = angle * i * (PI / 180.0f);
@@ -211,7 +210,7 @@ void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
         // std::cout << vel.x << ", " << vel.y << std::endl;
 
         enemy->cTransform = std::make_shared<CTransform>(CTransform(pos, vel, 0));
-        enemy->cShape = std::make_shared<CShape>(CShape(radius,points,sf::Color::Transparent,sf::Color::Red,3));
+        enemy->cShape = std::make_shared<CShape>(CShape(radius, points, sf::Color::Transparent, sf::Color::Red, 3));
         enemy->cCollision = std::make_shared<CCollision>(CCollision(radius));
         enemy->cLifeSpan = std::make_shared<CLifeSpan>(CLifeSpan(25));
     }
@@ -219,7 +218,7 @@ void GeoWarsGame::SpawnSmallEnemies(const std::shared_ptr<Entity>& e)
 
 void GeoWarsGame::SMovement() const
 {
-    m_player->cTransform->velocity = Vec2(0,0);
+    m_player->cTransform->velocity = Vec2(0, 0);
     constexpr float speed = 8;
     if (m_player->cInput->right)
         m_player->cTransform->velocity.x = 1 * speed;
@@ -230,7 +229,7 @@ void GeoWarsGame::SMovement() const
     else if (m_player->cInput->down)
         m_player->cTransform->velocity.y = 1 * speed;
 
-    for (auto& e : m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
@@ -240,16 +239,16 @@ void GeoWarsGame::SMovement() const
 
         e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
-        if(e->cTransform->pos.x >= m_window.getSize().x - e->cShape->circle.getRadius() || e->cTransform->pos.x <= e->cShape->circle.getRadius())
+        if (e->cTransform->pos.x >= m_window.getSize().x - e->cShape->circle.getRadius() || e->cTransform->pos.x <= e->cShape->circle.getRadius())
             e->cTransform->velocity.x *= -1;
-        if(e->cTransform->pos.y >= m_window.getSize().y - e->cShape->circle.getRadius() || e->cTransform->pos.y <= e->cShape->circle.getRadius())
+        if (e->cTransform->pos.y >= m_window.getSize().y - e->cShape->circle.getRadius() || e->cTransform->pos.y <= e->cShape->circle.getRadius())
             e->cTransform->velocity.y *= -1;
     }
 }
 
 void GeoWarsGame::SRotate() const
 {
-    for(auto& e : m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
         e->cShape->circle.rotate(6);
     }
@@ -257,7 +256,7 @@ void GeoWarsGame::SRotate() const
 
 void GeoWarsGame::SCollision()
 {
-    for (auto& e : m_entityManager.GetEntities("enemy"))
+    for (auto &e : m_entityManager.GetEntities("enemy"))
     {
         const Vec2 diffP(e->cTransform->pos.x - m_player->cTransform->pos.x, e->cTransform->pos.y - m_player->cTransform->pos.y);
         const float lenP = sqrt(diffP.x * diffP.x + diffP.y * diffP.y);
@@ -267,7 +266,7 @@ void GeoWarsGame::SCollision()
             break;
         }
 
-        for (auto& b : m_entityManager.GetEntities("bullet"))
+        for (auto &b : m_entityManager.GetEntities("bullet"))
         {
             const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
             const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
@@ -281,7 +280,7 @@ void GeoWarsGame::SCollision()
         }
     }
 
-    for (auto& e : m_entityManager.GetEntities("small enemy"))
+    for (auto &e : m_entityManager.GetEntities("small enemy"))
     {
         const Vec2 diffP(e->cTransform->pos.x - m_player->cTransform->pos.x, e->cTransform->pos.y - m_player->cTransform->pos.y);
         const float lenP = sqrt(diffP.x * diffP.x + diffP.y * diffP.y);
@@ -291,13 +290,13 @@ void GeoWarsGame::SCollision()
             break;
         }
 
-        for (auto& b : m_entityManager.GetEntities("bullet"))
+        for (auto &b : m_entityManager.GetEntities("bullet"))
         {
             const Vec2 diff(e->cTransform->pos.x - b->cTransform->pos.x, e->cTransform->pos.y - b->cTransform->pos.y);
             const float len = sqrt(diff.x * diff.x + diff.y * diff.y);
             if (len <= e->cCollision->radius + b->cCollision->radius)
             {
-                if(b->IsMarkedToBeDestroyedForNextFrame() == false) // since we destroy the bullet that killed the original enemy we don't want our small enemies also die with same bullet.
+                if (b->IsMarkedToBeDestroyedForNextFrame() == false) // since we destroy the bullet that killed the original enemy we don't want our small enemies also die with same bullet.
                 {
                     m_score += e->cShape->circle.getPointCount() * 20;
                     e->Destroy();
@@ -310,7 +309,7 @@ void GeoWarsGame::SCollision()
 void GeoWarsGame::SRender()
 {
     m_window.clear(sf::Color::Black);
-    for (auto& e : m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
         if (e->cShape)
         {
@@ -324,7 +323,7 @@ void GeoWarsGame::SRender()
 
 void GeoWarsGame::SUpdateLifeSpan()
 {
-    for (auto& e: m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
         if (e->cLifeSpan)
         {
@@ -332,7 +331,7 @@ void GeoWarsGame::SUpdateLifeSpan()
 
             if (e->cLifeSpan->remaining <= 0)
             {
-                    e->cLifeSpan->remaining = 0;
+                e->cLifeSpan->remaining = 0;
             }
         }
     }
@@ -340,9 +339,9 @@ void GeoWarsGame::SUpdateLifeSpan()
 
 void GeoWarsGame::SUpdateTransparencyBasedOnLifeSpan()
 {
-    for(auto& e : m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
-        if(e->cLifeSpan)
+        if (e->cLifeSpan)
         {
             auto fCol = e->cShape->circle.getFillColor();
             auto oCol = e->cShape->circle.getOutlineColor();
@@ -360,11 +359,11 @@ void GeoWarsGame::SUpdateTransparencyBasedOnLifeSpan()
 
 void GeoWarsGame::SDestroyEntitiesThatReachedEndOfTheirLifeSpan()
 {
-    for (auto& e: m_entityManager.GetEntities())
+    for (auto &e : m_entityManager.GetEntities())
     {
         if (e->cLifeSpan)
         {
-            if(e->cLifeSpan->remaining <= 0)
+            if (e->cLifeSpan->remaining <= 0)
             {
                 e->Destroy();
             }
@@ -382,4 +381,3 @@ int GeoWarsGame::GetRandomNumberInRange(const int lower_bound, const int upper_b
     const int random_number = distribution(gen);
     return random_number;
 }
-
