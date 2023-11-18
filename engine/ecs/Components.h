@@ -21,11 +21,10 @@ public:
 class CTransform : public Component
 {
 public:
-    std::string cmpName = "transform";
     Vec2 pos = Vec2(0,0);
     Vec2 velocity = Vec2(0,0);
 
-    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p, const Vec2& s) : Component(entity->Id(), cmpName)
+    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p, const Vec2& s) : Component(entity->Id(), typeid(CTransform).name())
     {
         pos = p;
     }
@@ -35,10 +34,9 @@ public:
 class CShape : public Component
 {
 public:
-    std::string cmpName = "shape";
     sf::CircleShape circle;
 
-    CShape(const std::shared_ptr<Entity>& entity, float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness) : Component(entity->Id(), cmpName)
+    CShape(const std::shared_ptr<Entity>& entity, float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness) : Component(entity->Id(), typeid(CShape).name())
     {
         circle.setRadius(radius);
         circle.setPointCount(points);

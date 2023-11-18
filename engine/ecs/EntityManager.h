@@ -17,7 +17,7 @@ public:
     std::shared_ptr<Entity> AddEntity(const std::string& tag = "default");
     const EntityVec& GetEntities() const;
     const EntityVec& GetEntities(const std::string& tag);
-    template<typename T> void AddComponent(const std::shared_ptr<Component>& cmp);
+    void AddComponent(const std::shared_ptr<Component>& cmp);
     template<typename T> std::vector<std::shared_ptr<T>> GetComponents();
 private:
     EntityVec m_entities;
@@ -29,17 +29,9 @@ private:
 };
 
 template<typename T>
-void EntityManager::AddComponent(const std::shared_ptr<Component>& cmp)
-{
-    std::cout << "add: " << typeid(T).name() << std::endl;
-    m_comps[typeid(T).name()].push_back(cmp);
-}
-
-template<typename T>
 std::vector<std::shared_ptr<T>> EntityManager::GetComponents()
 {
     std::vector<std::shared_ptr<T>> result;
-    std::cout << "get: " <<  typeid(T).name() << std::endl;
     for (const auto& cmpPtr : m_comps[typeid(T).name()])
     {
         if (std::dynamic_pointer_cast<T>(cmpPtr))

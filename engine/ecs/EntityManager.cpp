@@ -52,3 +52,8 @@ const EntityVec& EntityManager::GetEntities(const std::string &tag)
 {
     return m_entityMap[tag];
 }
+
+void EntityManager::AddComponent(const std::shared_ptr<Component>& cmp)
+{
+    m_comps[cmp->cmpName].push_back(cmp);
+}
