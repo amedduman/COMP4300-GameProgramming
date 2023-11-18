@@ -1,13 +1,15 @@
 #pragma once
-#include "math/Vec2.h"
+#include "../math/Vec2.h"
 #include <SFML/Graphics.hpp>
 
 class CTransform
 {
 public:
-    Vec2 pos;
-    Vec2 velocity;
-    float angle;
+    Vec2 pos = Vec2(0,0);
+    Vec2 velocity = Vec2(0,0);
+    float angle = 0;
+
+    CTransform(){}
 
     CTransform(const Vec2& p, const Vec2& s,float a)
             : pos(p),
@@ -21,6 +23,8 @@ class CShape
 {
 public:
     sf::CircleShape circle;
+
+    CShape(){}
 
     CShape(float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness)
             : circle(radius, points)
@@ -37,6 +41,9 @@ class CScore
 {
 public:
     int score;
+
+    CScore(){}
+
     CScore(int s)
             : score(s)
     {}
@@ -47,6 +54,9 @@ class CLifeSpan
 public:
     int remaining;
     int total;
+
+    CLifeSpan(){}
+
     CLifeSpan(int total)
             : remaining(total), total(total)
     {}

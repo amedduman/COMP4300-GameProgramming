@@ -1,21 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
-project(COMP4300_GameProgramming)
+project(COMP4300)
 
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-add_executable(COMP4300_GameProgramming main.cpp
-        examples/geo_wars/GeoWarsGame.cpp
-        examples/geo_wars/GeoWarsGame.h
-        engine/EntityManager.cpp
-        engine/EntityManager.h
-        engine/Entity.cpp
-        engine/Entity.h
-        engine/Components.h
-        engine/math/Vec2.cpp
-        engine/math/Vec2.h)
+file(GLOB_RECURSE EXAMPLE_FILES examples/*cpp)
+file(GLOB_RECURSE ENGINE_FILES engine/*.cpp)
 
+add_executable(COMP4300 main.cpp ${ENGINE_FILES} ${EXAMPLE_FILES})
 
 find_package(SFML 2.5 COMPONENTS window graphics REQUIRED)
-target_link_libraries(COMP4300_GameProgramming sfml-window sfml-graphics)
+target_link_libraries(COMP4300 sfml-window sfml-graphics)
