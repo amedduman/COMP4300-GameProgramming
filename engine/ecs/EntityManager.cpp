@@ -1,7 +1,8 @@
 #include "EntityManager.h"
-#include "Entity.h"
+
 #include <iostream>
-#include <type_traits>
+
+#include "Entity.h"
 
 typedef std::vector<std::shared_ptr<Entity>> EntityVec;
 typedef std::map<std::string, EntityVec> EntityMap;

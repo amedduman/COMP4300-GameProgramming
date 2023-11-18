@@ -63,30 +63,41 @@ public:
 };
 
 int main() {
-    AnimalManager animalManager;
+    // AnimalManager animalManager;
+    //
+    // // Adding animals
+    // animalManager.AddAnimal(std::make_shared<Dog>("first dog"), "Dogs");
+    // animalManager.AddAnimal(std::make_shared<Cat>("first cat"), "Cats");
+    // animalManager.AddAnimal(std::make_shared<Dog>("second dog"), "Dogs");
+    // animalManager.AddAnimal(std::make_shared<Cat>("second cat"), "Cats");
+    //
+    // // Retrieving animals
+    // auto dogs = animalManager.GetAnimals<Dog>();
+    // auto cats = animalManager.GetAnimals<Cat>();
+    //
+    // // Use the retrieved vectors as needed
+    // for (const auto& dog : dogs)
+    // {
+    //     std::cout << dog->dogName << std::endl;
+    //     // Do something with dog
+    // }
+    //
+    // for (const auto& cat : cats)
+    // {
+    //     std::cout << cat->catName << std::endl;
+    //     // Do something with cat
+    // }
+    //
+    // return 0;
 
-    // Adding animals
-    animalManager.AddAnimal(std::make_shared<Dog>("first dog"), "Dogs");
-    animalManager.AddAnimal(std::make_shared<Cat>("first cat"), "Cats");
-    animalManager.AddAnimal(std::make_shared<Dog>("second dog"), "Dogs");
-    animalManager.AddAnimal(std::make_shared<Cat>("second cat"), "Cats");
+    EntityManager emg;
 
-    // Retrieving animals
-    auto dogs = animalManager.GetAnimals<Dog>();
-    auto cats = animalManager.GetAnimals<Cat>();
+    auto player = emg.AddEntity("player");
+    emg.AddComponent<CTransform>(std::make_shared<CTransform>(player, Vec2(100, 100), Vec2(0,0)));
+    emg.AddComponent<CShape>(std::make_shared<CShape>(player, 32, 32, sf::Color::Green, sf::Color::Red, 4));
 
-    // Use the retrieved vectors as needed
-    for (const auto& dog : dogs)
+    for (const auto& e : emg.GetComponents<CTransform>())
     {
-        std::cout << dog->dogName << std::endl;
-        // Do something with dog
+        std::cout << e->pos.x << ", " << e->pos.y << std::endl;
     }
-
-    for (const auto& cat : cats)
-    {
-        std::cout << cat->catName << std::endl;
-        // Do something with cat
-    }
-
-    return 0;
 }
