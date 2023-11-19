@@ -5,6 +5,7 @@
 #include <string>
 #include "Entity.h"
 #include "Components.h"
+#include <type_traits>
 
 class EntityManager
 {
@@ -19,6 +20,7 @@ public:
     const EntityVec& GetEntities(const std::string& tag);
     void AddComponent(const std::shared_ptr<Component>& cmp);
     template<typename T> std::vector<std::shared_ptr<T>> GetComponents();
+    template<typename T> std::vector<std::shared_ptr<T>> GetComponents(const std::string& tag);
 private:
     EntityVec m_entities;
     EntityVec m_toAdd;
@@ -36,6 +38,24 @@ std::vector<std::shared_ptr<T>> EntityManager::GetComponents()
     {
         if (std::dynamic_pointer_cast<T>(cmpPtr))
         {
+            if (cmpPtr->entity->IsAlive() == false) continue;
+            result.push_back(std::dynamic_pointer_cast<T>(cmpPtr));
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
+std::vector<std::shared_ptr<T>> EntityManager::GetComponents(const std::string& tag)
+{
+    std::vector<std::shared_ptr<T>> result;
+    for (const auto& cmpPtr : m_comps[typeid(T).name()])
+    {
+        if (std::dynamic_pointer_cast<T>(cmpPtr))
+        {
+            if (cmpPtr->entity->IsAlive() == false) continue;
+            if (cmpPtr->entity->Tag() != tag) continue;
             result.push_back(std::dynamic_pointer_cast<T>(cmpPtr));
         }
     }

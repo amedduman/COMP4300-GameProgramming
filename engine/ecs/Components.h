@@ -8,10 +8,10 @@
 class Component
 {
 public:
-    size_t ownerId = 0;
+    std::shared_ptr<Entity> entity;
     std::string cmpName;
-    explicit Component(const size_t& id, const std::string& name)
-        :ownerId(id),
+    explicit Component(const std::shared_ptr<Entity>& _enity, const std::string& name)
+        :entity(_enity),
          cmpName(name)
     {
     }
@@ -24,7 +24,7 @@ public:
     Vec2 pos = Vec2(0,0);
     Vec2 velocity = Vec2(0,0);
 
-    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p, const Vec2& s) : Component(entity->Id(), typeid(CTransform).name())
+    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p, const Vec2& s) : Component(entity, typeid(CTransform).name())
     {
         pos = p;
     }
@@ -36,7 +36,7 @@ class CShape : public Component
 public:
     sf::CircleShape circle;
 
-    CShape(const std::shared_ptr<Entity>& entity, float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness) : Component(entity->Id(), typeid(CShape).name())
+    CShape(const std::shared_ptr<Entity>& entity, float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness) : Component(entity, typeid(CShape).name())
     {
         circle.setRadius(radius);
         circle.setPointCount(points);
