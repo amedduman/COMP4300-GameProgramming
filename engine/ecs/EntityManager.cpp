@@ -33,13 +33,13 @@ void EntityManager::Update()
         EntityVec& entityVec = pair.second;
         entityVec.erase(std::remove_if(entityVec.begin(), entityVec.end(),
                                        [](const std::shared_ptr<Entity> &e)
-                                       { return e->IsAlive(); }),
+                                       { return !e->IsAlive(); }),
                         entityVec.end());
     }
 
     m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(),
                                     [](const std::shared_ptr<Entity> &e)
-                                    { return e->IsAlive(); }),
+                                    { return !e->IsAlive(); }),
                      m_entities.end());
 }
 
