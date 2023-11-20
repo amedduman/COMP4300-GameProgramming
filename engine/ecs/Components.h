@@ -22,9 +22,8 @@ class CTransform : public Component
 {
 public:
     Vec2 pos = Vec2(0,0);
-    Vec2 velocity = Vec2(0,0);
 
-    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p, const Vec2& s) : Component(entity, typeid(CTransform).name())
+    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p) : Component(entity, typeid(CTransform).name())
     {
         pos = p;
     }
@@ -34,16 +33,12 @@ public:
 class CShape : public Component
 {
 public:
-    sf::CircleShape circle;
+    sf::RectangleShape rect;
 
-    CShape(const std::shared_ptr<Entity>& entity, float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness) : Component(entity, typeid(CShape).name())
+    CShape(const std::shared_ptr<Entity>& entity, sf::Vector2f size, const sf::Color& fill) : Component(entity, typeid(CShape).name())
     {
-        circle.setRadius(radius);
-        circle.setPointCount(points);
-        circle.setOutlineColor(outline);
-        circle.setFillColor(fill);
-        circle.setOutlineThickness(thickness);
-        circle.setOrigin(radius, radius);
+        rect.setSize(size);
+        rect.setFillColor(fill);
     }
 };
 
