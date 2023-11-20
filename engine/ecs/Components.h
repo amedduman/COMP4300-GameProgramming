@@ -35,11 +35,13 @@ class CShape : public Component
 public:
     sf::RectangleShape rect;
 
-    CShape(const std::shared_ptr<Entity>& entity, sf::Vector2f size, const sf::Color& fill) : Component(entity, typeid(CShape).name())
+    CShape(const std::shared_ptr<Entity>& entity, sf::Vector2f size, const sf::Color& fill , const sf::Color& outline = sf::Color::White, float thickness = 0) : Component(entity, typeid(CShape).name())
     {
         rect.setSize(size);
         rect.setFillColor(fill);
         rect.setOrigin(size.x/2, size.y/2);
+        rect.setOutlineThickness(thickness);
+        rect.setOutlineColor(outline);
     }
 };
 
