@@ -39,6 +39,29 @@ public:
     {
         rect.setSize(size);
         rect.setFillColor(fill);
+        rect.setOrigin(size.x/2, size.y/2);
+    }
+};
+
+class CMarioInput : public Component
+{
+public:
+    CMarioInput(const std::shared_ptr<Entity>& entity) : Component(entity, typeid(CMarioInput).name())
+    {}
+
+    bool moveUP = false;
+    bool moveDown = false;
+    bool moveRight = false;
+    bool moveLeft = false;
+    bool fire = false;
+};
+
+class CVelocity : public Component
+{
+public:
+    Vec2 velocity;
+    explicit CVelocity(const std::shared_ptr<Entity>& entity) : Component(entity, typeid(CVelocity).name())
+    {
     }
 };
 

@@ -15,6 +15,7 @@ private:
     void SpawnEnemies();
 
     void SInput();
+    void SCalculateVelocity();
     void SMovement();
     void SRender();
 };

@@ -20,6 +20,7 @@ public:
     const EntityVec& GetEntities(const std::string& tag);
     void AddComponent(const std::shared_ptr<Component>& cmp);
     template<typename T> const std::shared_ptr<T>& GetComponent(const std::shared_ptr<Entity>& entity);
+    template<typename T> const std::shared_ptr<T>& GetComponent(const std::string& tag);
     template<typename T> std::vector<std::shared_ptr<T>> GetComponents();
     template<typename T> std::vector<std::shared_ptr<T>> GetComponents(const std::string& tag);
 private:
@@ -43,6 +44,21 @@ const std::shared_ptr<T>& EntityManager::GetComponent(const std::shared_ptr<Enti
         }
     }
     std::cout << "can't find " << typeid(T).name() << "component for " << "entity " << "tag: " << entity->Tag() << ", id: " << entity->Id() << std::endl;
+    return nullptr;
+}
+
+template<typename T>
+const std::shared_ptr<T>& EntityManager::GetComponent(const std::string& tag)
+{
+    for (const auto& cmpPtr : m_comps[typeid(T).name()])
+    {
+        if (std::dynamic_pointer_cast<T>(cmpPtr))
+        {
+            if (cmpPtr->entity->IsAlive() == false) continue;
+            if (cmpPtr->entity->Tag() == tag) return std::dynamic_pointer_cast<T>(cmpPtr);
+        }
+    }
+    std::cout << "can't find " << typeid(T).name() << "component for " << "entity " << "tag: " << tag  << std::endl;
     return nullptr;
 }
 
