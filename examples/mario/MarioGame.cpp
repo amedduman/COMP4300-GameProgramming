@@ -136,17 +136,32 @@ void MarioGame::SDetectCollision()
     AddDebugShape(sf::Vector2f(rectPosLeftBottom.x,rectPosLeftBottom.y), sf::Vector2f(30,10));
 
     auto playerTr = m_entityManager.GetComponent<CTransform>("player");
-    if (rectPosTopRight.x < playerTr->pos.x &&
-        rectPosLeftBottom.x > playerTr->pos.x &&
-        rectPosTopRight.y < playerTr->pos.y &&
-        rectPosLeftBottom.y > playerTr->pos.y)
-    {
-        enemyShape->rect.setOutlineColor(sf::Color::Green);
-    }
+    auto playerShape = m_entityManager.GetComponent<CShape>("player");
+
+    Vec2 playerTopR = Vec2(playerTr->pos.x - playerShape->rect.getSize().x / 2,
+                                playerTr->pos.y - playerShape->rect.getSize().y / 2);
+    Vec2 playerBottomL = Vec2(playerTr->pos.x + playerShape->rect.getSize().x / 2,
+                                playerTr->pos.y + playerShape->rect.getSize().y / 2);
+
+    // if (rectPosTopRight.x < playerTr->pos.x &&
+    //     rectPosLeftBottom.x > playerTr->pos.x &&
+    //     rectPosTopRight.y < playerTr->pos.y &&
+    //     rectPosLeftBottom.y > playerTr->pos.y)
+    // {
+    //     enemyShape->rect.setOutlineColor(sf::Color::Green);
+    // }
+    // else
+    // {
+    //     enemyShape->rect.setOutlineColor(sf::Color::Yellow);
+    // }
+
+    if (playerTopR.x < rectPosLeftBottom.x &&
+        rectPosTopRight.x < playerBottomL.x &&
+        playerTopR.y < rectPosLeftBottom.y &&
+        rectPosTopRight.y < playerTopR.y)
+    {enemyShape->rect.setOutlineColor(sf::Color::Green);}
     else
-    {
         enemyShape->rect.setOutlineColor(sf::Color::Yellow);
-    }
 }
 void MarioGame::SRender()
 {
