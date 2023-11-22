@@ -29,7 +29,7 @@ void MarioGame::SpawnPlayer()
 {
     auto player = m_entityManager.AddEntity("player");
     m_entityManager.AddComponent(std::make_shared<CTransform>(player, Vec2(100, 100)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(player, sf::Vector2f(25, 25), sf::Color::White));
+    m_entityManager.AddComponent(std::make_shared<CShape>(player, sf::Vector2f(25, 25), sf::Color::Transparent));
     m_entityManager.AddComponent(std::make_shared<CMarioInput>(player));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
     m_entityManager.AddComponent(std::make_shared<CBoxCollider>(player, m_entityManager.GetComponent<CShape>(player)));
@@ -38,7 +38,7 @@ void MarioGame::SpawnEnemies()
 {
     auto enemy = m_entityManager.AddEntity("enemy");
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(200, 200), sf::Color::Transparent, sf::Color::Yellow, 4));
+    m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(200, 200), sf::Color::Transparent, sf::Color::Yellow, 1));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
     m_entityManager.AddComponent(std::make_shared<CBoxCollider>(enemy, m_entityManager.GetComponent<CShape>(enemy)));
 }
@@ -127,11 +127,7 @@ void MarioGame::SDetectCollision()
 {
     auto rectE = m_entityManager.GetComponent<CBoxCollider>("enemy");
     auto rectP = m_entityManager.GetComponent<CBoxCollider>("player");
-    auto point = m_entityManager.GetComponent<CTransform>("player")->pos;
-    // if (PointVsRect(point, rectE))
-    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
-    // else
-    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Yellow);
+
     if (RectVsRect(rectE, rectP))
         m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
     else
