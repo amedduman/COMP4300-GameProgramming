@@ -32,6 +32,7 @@ void MarioGame::SpawnPlayer()
     m_entityManager.AddComponent(std::make_shared<CShape>(player, sf::Vector2f(25, 25), sf::Color::White));
     m_entityManager.AddComponent(std::make_shared<CMarioInput>(player));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
+    m_entityManager.AddComponent(std::make_shared<CBoxCollider>(player, m_entityManager.GetComponent<CShape>(player)));
 }
 void MarioGame::SpawnEnemies()
 {
@@ -39,6 +40,7 @@ void MarioGame::SpawnEnemies()
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2)));
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(200, 200), sf::Color::Transparent, sf::Color::Yellow, 4));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
+    m_entityManager.AddComponent(std::make_shared<CBoxCollider>(enemy, m_entityManager.GetComponent<CShape>(enemy)));
 }
 
 void MarioGame::SInput()
@@ -123,45 +125,12 @@ void MarioGame::SMovement()
 }
 void MarioGame::SDetectCollision()
 {
-    // log if player is inside enemy
-    auto enemyShape = m_entityManager.GetComponent<CShape>("enemy");
-    auto enemyTr = m_entityManager.GetComponent<CTransform>("enemy");
-    Vec2 rectPos = Vec2(enemyTr->pos.x,
-                        enemyTr->pos.y);
-    Vec2 rectPosTopRight = Vec2(enemyTr->pos.x - enemyShape->rect.getSize().x / 2,
-                                enemyTr->pos.y - enemyShape->rect.getSize().y / 2);
-    Vec2 rectPosLeftBottom = Vec2(enemyTr->pos.x + enemyShape->rect.getSize().x / 2,
-                                enemyTr->pos.y + enemyShape->rect.getSize().y / 2);
-    AddDebugShape(sf::Vector2f(rectPosTopRight.x,rectPosTopRight.y), sf::Vector2f(30,10));
-    AddDebugShape(sf::Vector2f(rectPosLeftBottom.x,rectPosLeftBottom.y), sf::Vector2f(30,10));
-
-    auto playerTr = m_entityManager.GetComponent<CTransform>("player");
-    auto playerShape = m_entityManager.GetComponent<CShape>("player");
-
-    Vec2 playerTopR = Vec2(playerTr->pos.x - playerShape->rect.getSize().x / 2,
-                                playerTr->pos.y - playerShape->rect.getSize().y / 2);
-    Vec2 playerBottomL = Vec2(playerTr->pos.x + playerShape->rect.getSize().x / 2,
-                                playerTr->pos.y + playerShape->rect.getSize().y / 2);
-
-    // if (rectPosTopRight.x < playerTr->pos.x &&
-    //     rectPosLeftBottom.x > playerTr->pos.x &&
-    //     rectPosTopRight.y < playerTr->pos.y &&
-    //     rectPosLeftBottom.y > playerTr->pos.y)
-    // {
-    //     enemyShape->rect.setOutlineColor(sf::Color::Green);
-    // }
-    // else
-    // {
-    //     enemyShape->rect.setOutlineColor(sf::Color::Yellow);
-    // }
-
-    if (playerTopR.x < rectPosLeftBottom.x &&
-        rectPosTopRight.x < playerBottomL.x &&
-        playerTopR.y < rectPosLeftBottom.y &&
-        rectPosTopRight.y < playerTopR.y)
-    {enemyShape->rect.setOutlineColor(sf::Color::Green);}
-    else
-        enemyShape->rect.setOutlineColor(sf::Color::Yellow);
+    auto rect = m_entityManager.GetComponent<CBoxCollider>("enemy");
+    auto point = m_entityManager.GetComponent<CTransform>("player")->pos;
+    if (PointVsRect(point, rect))
+    {
+        std::cout << "in the rectangle" << std::endl;
+    }
 }
 void MarioGame::SRender()
 {
@@ -172,19 +141,26 @@ void MarioGame::SRender()
     }
     for (auto& e : m_debugShapes)
     {
-        m_window.draw(e);
+        m_window.draw(e->rect);
     }
     m_window.display();
 }
 
-void MarioGame::AddDebugShape(sf::Vector2f pos, sf::Vector2f size, sf::Color fCol, sf::Color oCol, float thickness)
+void MarioGame::AddDebugShape(const std::shared_ptr<CShape>& shape)
 {
-    auto r = sf::RectangleShape();
-    r.setSize(size);
-    r.setOrigin(r.getSize().x/2,r.getSize().y/2);
-    r.setPosition(pos);
-    r.setFillColor(fCol);
-    r.setOutlineColor(oCol);
-    r.setOutlineThickness(thickness);
-    m_debugShapes.push_back(r);
+    // shape->rect.setFillColor(sf::Color::Transparent);
+    // shape->rect.setOutlineColor(sf::Color::Green);
+    m_debugShapes.push_back(shape);
+}
+
+bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoxCollider>& rect)
+{
+    if (point.x > rect->TopLeft().x                &&
+        point.x < rect->TopLeft().x + rect->width  &&
+        point.y > rect->TopLeft().y                &&
+        point.y < rect->TopLeft().y + rect->height)
+    {
+        return true;
+    }
+    return false;
 }

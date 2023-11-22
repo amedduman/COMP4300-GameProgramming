@@ -45,6 +45,28 @@ public:
     }
 };
 
+class CBoxCollider : public Component
+{
+public:
+    float width;
+    float height;
+    CBoxCollider(const std::shared_ptr<Entity>& entity, const std::shared_ptr<CShape>& shape) : Component(entity, typeid(CBoxCollider).name())
+    {
+        m_shape = shape;
+        this->width = shape->rect.getSize().x;
+        this->height = shape->rect.getSize().y;
+    }
+
+    Vec2 TopLeft()
+    {
+        auto topLeft = Vec2(m_shape->rect.getPosition().x - m_shape->rect.getSize().x / 2,
+                       m_shape->rect.getPosition().y - m_shape->rect.getSize().y / 2);
+        return topLeft;
+    }
+private:
+    std::shared_ptr<CShape> m_shape;
+};
+
 class CMarioInput : public Component
 {
 public:
