@@ -125,12 +125,17 @@ void MarioGame::SMovement()
 }
 void MarioGame::SDetectCollision()
 {
-    auto rect = m_entityManager.GetComponent<CBoxCollider>("enemy");
+    auto rectE = m_entityManager.GetComponent<CBoxCollider>("enemy");
+    auto rectP = m_entityManager.GetComponent<CBoxCollider>("player");
     auto point = m_entityManager.GetComponent<CTransform>("player")->pos;
-    if (PointVsRect(point, rect))
-    {
-        std::cout << "in the rectangle" << std::endl;
-    }
+    // if (PointVsRect(point, rectE))
+    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
+    // else
+    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Yellow);
+    if (RectVsRect(rectE, rectP))
+        m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
+    else
+        m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Yellow);
 }
 void MarioGame::SRender()
 {
@@ -159,6 +164,18 @@ bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoxCollider>& rec
         point.x < rect->TopLeft().x + rect->width  &&
         point.y > rect->TopLeft().y                &&
         point.y < rect->TopLeft().y + rect->height)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool MarioGame::RectVsRect(const std::shared_ptr<CBoxCollider>& rect1, const std::shared_ptr<CBoxCollider>& rect2)
+{
+    if(rect1->TopLeft().x  < rect2->TopLeft().x + rect2->width  &&
+        rect2->TopLeft().x < rect1->TopLeft().x + rect1->width  &&
+        rect1->TopLeft().y < rect2->TopLeft().y + rect2->height &&
+        rect2->TopLeft().y < rect1->TopLeft().y + rect1->height )
     {
         return true;
     }
