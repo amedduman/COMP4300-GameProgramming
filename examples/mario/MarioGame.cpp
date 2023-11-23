@@ -177,8 +177,9 @@ bool MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::
 
     float dx = abs(bb1pos.x - bb2pos.x);
     float dy = abs(bb1pos.y - bb2pos.y);
-    if (  bb1->halfWidth  + bb2->halfWidth  - dx > 0   &&
-          bb1->halfHeight + bb2->halfHeight - dy > 0     )
+    Vec2 overlapArea = Vec2(bb1->halfWidth + bb2->halfWidth - dx, bb1->halfHeight + bb2->halfHeight - dy);
+    if ( overlapArea.x > 0 &&
+         overlapArea.y > 0   )
         return true;
     return false;
 }
