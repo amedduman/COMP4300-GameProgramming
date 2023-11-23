@@ -45,26 +45,21 @@ public:
     }
 };
 
-class CBoxCollider : public Component
+class CBoundingBox : public Component
 {
 public:
     float width;
     float height;
-    CBoxCollider(const std::shared_ptr<Entity>& entity, const std::shared_ptr<CShape>& shape) : Component(entity, typeid(CBoxCollider).name())
+    float halfWidth;
+    float halfHeight;
+    CBoundingBox(const std::shared_ptr<Entity>& entity, const Vec2& size) : Component(entity, typeid(CBoundingBox).name())
     {
-        m_shape = shape;
-        this->width = shape->rect.getSize().x;
-        this->height = shape->rect.getSize().y;
-    }
+        width = size.x;
+        halfWidth = width / 2;
+        height = size.y;
+        halfHeight = height / 2;
 
-    Vec2 TopLeft()
-    {
-        auto topLeft = Vec2(m_shape->rect.getPosition().x - m_shape->rect.getSize().x / 2,
-                       m_shape->rect.getPosition().y - m_shape->rect.getSize().y / 2);
-        return topLeft;
     }
-private:
-    std::shared_ptr<CShape> m_shape;
 };
 
 class CMarioInput : public Component

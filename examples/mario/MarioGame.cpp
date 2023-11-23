@@ -28,19 +28,23 @@ void MarioGame::Run()
 void MarioGame::SpawnPlayer()
 {
     auto player = m_entityManager.AddEntity("player");
+    constexpr float sizeX = 25;
+    constexpr float sizeY = 25;
     m_entityManager.AddComponent(std::make_shared<CTransform>(player, Vec2(100, 100)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(player, sf::Vector2f(25, 25), sf::Color::Transparent));
+    m_entityManager.AddComponent(std::make_shared<CShape>(player, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
     m_entityManager.AddComponent(std::make_shared<CMarioInput>(player));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
-    m_entityManager.AddComponent(std::make_shared<CBoxCollider>(player, m_entityManager.GetComponent<CShape>(player)));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(player, Vec2(sizeX, sizeY)));
 }
 void MarioGame::SpawnEnemies()
 {
     auto enemy = m_entityManager.AddEntity("enemy");
+    constexpr float sizeX = 200;
+    constexpr float sizeY = 200;
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(200, 200), sf::Color::Transparent, sf::Color::Yellow, 1));
+    m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow, 1));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
-    m_entityManager.AddComponent(std::make_shared<CBoxCollider>(enemy, m_entityManager.GetComponent<CShape>(enemy)));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(sizeY, sizeY)));
 }
 
 void MarioGame::SInput()
@@ -125,8 +129,8 @@ void MarioGame::SMovement()
 }
 void MarioGame::SDetectCollision()
 {
-    auto rectE = m_entityManager.GetComponent<CBoxCollider>("enemy");
-    auto rectP = m_entityManager.GetComponent<CBoxCollider>("player");
+    auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
+    auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
 
     if (RectVsRect(rectE, rectP))
         m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
@@ -154,26 +158,27 @@ void MarioGame::AddDebugShape(const std::shared_ptr<CShape>& shape)
     m_debugShapes.push_back(shape);
 }
 
-bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoxCollider>& rect)
+bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoundingBox>& rect)
 {
-    if (point.x > rect->TopLeft().x                &&
-        point.x < rect->TopLeft().x + rect->width  &&
-        point.y > rect->TopLeft().y                &&
-        point.y < rect->TopLeft().y + rect->height)
-    {
-        return true;
-    }
-    return false;
+    // if (point.x > rect->TopLeft().x                &&
+    //     point.x < rect->TopLeft().x + rect->width  &&
+    //     point.y > rect->TopLeft().y                &&
+    //     point.y < rect->TopLeft().y + rect->height)
+    // {
+    //     return true;
+    // }
+    // return false;
 }
 
-bool MarioGame::RectVsRect(const std::shared_ptr<CBoxCollider>& rect1, const std::shared_ptr<CBoxCollider>& rect2)
+bool MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::shared_ptr<CBoundingBox>& bb2)
 {
-    if(rect1->TopLeft().x  < rect2->TopLeft().x + rect2->width  &&
-        rect2->TopLeft().x < rect1->TopLeft().x + rect1->width  &&
-        rect1->TopLeft().y < rect2->TopLeft().y + rect2->height &&
-        rect2->TopLeft().y < rect1->TopLeft().y + rect1->height )
-    {
+    auto bb1pos = m_entityManager.GetComponent<CTransform>(bb1->entity)->pos;
+    auto bb2pos = m_entityManager.GetComponent<CTransform>(bb2->entity)->pos;
+
+    float dx = abs(bb1pos.x - bb2pos.x);
+    float dy = abs(bb1pos.y - bb2pos.y);
+    if (  bb1->halfWidth  + bb2->halfWidth  - dx > 0   &&
+          bb1->halfHeight + bb2->halfHeight - dy > 0     )
         return true;
-    }
     return false;
 }

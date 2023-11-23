@@ -15,8 +15,8 @@ private:
     void SpawnPlayer();
     void SpawnEnemies();
     void AddDebugShape(const std::shared_ptr<CShape>&);
-    bool PointVsRect(Vec2 point, const std::shared_ptr<CBoxCollider>& rect);
-    bool RectVsRect(const std::shared_ptr<CBoxCollider>& rect1, const std::shared_ptr<CBoxCollider>& rect2);
+    bool PointVsRect(Vec2 point, const std::shared_ptr<CBoundingBox>& rect);
+    bool RectVsRect(const std::shared_ptr<CBoundingBox>& rect1, const std::shared_ptr<CBoundingBox>& rect2);
 
     void SInput();
     void SCalculateVelocity();
