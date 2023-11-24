@@ -21,12 +21,32 @@ public:
 class CTransform : public Component
 {
 public:
-    Vec2 pos = Vec2(0,0);
+    // Vec2 pos = Vec2(0,0);
 
-    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p) : Component(entity, typeid(CTransform).name())
+    CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p = Vec2(0, 0)) : Component(entity, typeid(CTransform).name())
     {
-        pos = p;
+        m_pos = p;
     }
+    Vec2 GetPos()
+    {
+        return m_pos;
+    }
+    Vec2 GetPreviousPos()
+    {
+        return m_previousPos;
+    }
+    void SetPos(const float x, const float y)
+    {
+        SetPos(Vec2(x, y));
+    }
+    void SetPos(const Vec2& pos)
+    {
+        m_previousPos = m_pos;
+        m_pos = pos;
+    }
+private:
+    Vec2 m_pos;
+    Vec2 m_previousPos;
 };
 
 
@@ -60,7 +80,7 @@ public:
         halfHeight = height / 2;
 
     }
-};
+;};
 
 class CMarioInput : public Component
 {

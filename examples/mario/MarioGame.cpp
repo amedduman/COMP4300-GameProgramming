@@ -121,9 +121,10 @@ void MarioGame::SMovement()
         auto vel = m_entityManager.GetComponent<CVelocity>(e);
         if (tr && shape && vel)
         {
-            tr->pos.x += vel->velocity.x;
-            tr->pos.y += vel->velocity.y;
-            shape->rect.setPosition(tr->pos.x, tr->pos.y);
+            tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
+            // tr->pos.x += vel->velocity.x;
+            // tr->pos.y += vel->velocity.y;
+            shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
         }
     }
 }
@@ -172,8 +173,8 @@ bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoundingBox>& rec
 
 bool MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::shared_ptr<CBoundingBox>& bb2)
 {
-    auto bb1pos = m_entityManager.GetComponent<CTransform>(bb1->entity)->pos;
-    auto bb2pos = m_entityManager.GetComponent<CTransform>(bb2->entity)->pos;
+    auto bb1pos = m_entityManager.GetComponent<CTransform>(bb1->entity)->GetPos();
+    auto bb2pos = m_entityManager.GetComponent<CTransform>(bb2->entity)->GetPos();
 
     float dx = abs(bb1pos.x - bb2pos.x);
     float dy = abs(bb1pos.y - bb2pos.y);
