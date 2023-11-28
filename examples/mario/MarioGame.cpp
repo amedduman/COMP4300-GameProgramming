@@ -22,6 +22,7 @@ void MarioGame::Run()
         SMovement();
         SDetectCollision();
         Reselotion();
+        SyncShapeAndTransform();
         SRender();
     }
 }
@@ -133,7 +134,7 @@ void MarioGame::SMovement()
         {
             // std::cout << "set pos" << std::endl;
             tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
-            shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
+            // shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
         }
     }
 }
@@ -207,33 +208,49 @@ void MarioGame::Reselotion()
     auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
     auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
 
+    auto trE = m_entityManager.GetComponent<CTransform>("enemy");
+    auto trP = m_entityManager.GetComponent<CTransform>("player");
+
     auto overlapArea = RectVsRect(rectE, rectP);
     if (overlapArea.x > 0 && overlapArea.y > 0)
     {
-        // burda bir onceki collision degerlerine bak overlap degerlerini yazdir
-        std::cout << "current" << std::endl;
-        std::cout << overlapArea.x << ", " << overlapArea.y << std::endl;
-
-        // auto bb1pos = m_entityManager.GetComponent<CTransform>(rectE->entity)->GetPreviousPos();
-        // auto bb2pos = m_entityManager.GetComponent<CTransform>(rectP->entity)->GetPreviousPos();
-        //
-        // float dx = abs(bb1pos.x - bb2pos.x);
-        // float dy = abs(bb1pos.y - bb2pos.y);
-        // Vec2 overlapAreaP = Vec2(rectE->halfWidth + rectP->halfWidth - dx, rectE->halfHeight + rectP->halfHeight - dy);
-        // std::cout << "previous" << std::endl;
-
         auto previousOverlapArea = RectVsRect(rectE, rectP, true);
-        std::cout << "previous" << std::endl;
-        std::cout << previousOverlapArea.x << ", " << previousOverlapArea.y << std::endl;
         if(previousOverlapArea.y > 0)
         {
             std::cout << "move in x direction to resolve the collision" << std::endl;
+            if (trP->GetPos().x > trP->GetPreviousPos().x)
+            {
+                trP->SetPos(trP->GetPos().x - overlapArea.x, trP->GetPos().y);
+            }
+            else
+            {
+                trP->SetPos(trP->GetPos().x + overlapArea.x, trP->GetPos().y);
+            }
         }
         if(previousOverlapArea.x > 0)
         {
             std::cout << "move in y direction to resolve the collision" << std::endl;
+            if (trP->GetPos().y > trP->GetPreviousPos().y)
+            {
+                trP->SetPos(trP->GetPos().x, trP->GetPos().y  - overlapArea.y);
+            }
+            else
+            {
+                trP->SetPos(trP->GetPos().x, trP->GetPos().y  + overlapArea.y);
+            }
         }
+    }
+}
 
-        m_window.close();
+void MarioGame::SyncShapeAndTransform()
+{
+    for (auto& e : m_entityManager.GetEntities())
+    {
+        auto tr = m_entityManager.GetComponent<CTransform>(e);
+        auto shape = m_entityManager.GetComponent<CShape>(e);
+        if (tr && shape)
+        {
+            shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
+        }
     }
 }

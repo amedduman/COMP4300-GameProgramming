@@ -19,6 +19,7 @@ private:
     bool PointVsRect(Vec2 point, const std::shared_ptr<CBoundingBox>& rect);
     Vec2 RectVsRect(const std::shared_ptr<CBoundingBox>& rect1, const std::shared_ptr<CBoundingBox>& rect2, bool doForPreviousPos = false);
     void Reselotion();
+    void SyncShapeAndTransform();
 
     void SInput();
     void SCalculateVelocity();
