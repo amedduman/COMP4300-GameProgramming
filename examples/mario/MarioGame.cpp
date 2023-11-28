@@ -17,6 +17,7 @@ void MarioGame::Run()
     {
         m_entityManager.Update();
         m_frameCount ++;
+        
         SInput();
         SCalculateVelocity();
         SMovement();
@@ -80,14 +81,6 @@ void MarioGame::SInput()
             {
                 m_window.close();
             }
-            if(event.key.code == sf::Keyboard::Space)
-            {
-                auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
-                auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
-
-                auto overlapArea = RectVsRect(rectE, rectP);
-                std::cout << overlapArea.x << ", " << overlapArea.y << std::endl;
-            }
         }
         if (event.type == sf::Event::KeyReleased)
         {
@@ -124,17 +117,13 @@ void MarioGame::SCalculateVelocity()
 }
 void MarioGame::SMovement()
 {
-    // std::cout << "frame count: " << m_frameCount << std::endl;
     for (auto& e : m_entityManager.GetEntities())
     {
         auto tr = m_entityManager.GetComponent<CTransform>(e);
-        auto shape = m_entityManager.GetComponent<CShape>(e);
         auto vel = m_entityManager.GetComponent<CVelocity>(e);
-        if (tr && shape && vel)
+        if (tr && vel)
         {
-            // std::cout << "set pos" << std::endl;
             tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
-            // shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
         }
     }
 }
@@ -156,30 +145,7 @@ void MarioGame::SRender()
     {
         m_window.draw(e->rect);
     }
-    for (auto& e : m_debugShapes)
-    {
-        m_window.draw(e->rect);
-    }
     m_window.display();
-}
-
-void MarioGame::AddDebugShape(const std::shared_ptr<CShape>& shape)
-{
-    // shape->rect.setFillColor(sf::Color::Transparent);
-    // shape->rect.setOutlineColor(sf::Color::Green);
-    m_debugShapes.push_back(shape);
-}
-
-bool MarioGame::PointVsRect(Vec2 point, const std::shared_ptr<CBoundingBox>& rect)
-{
-    // if (point.x > rect->TopLeft().x                &&
-    //     point.x < rect->TopLeft().x + rect->width  &&
-    //     point.y > rect->TopLeft().y                &&
-    //     point.y < rect->TopLeft().y + rect->height)
-    // {
-    //     return true;
-    // }
-    // return false;
 }
 
 Vec2 MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::shared_ptr<CBoundingBox>& bb2, bool doForPreviousPos)
@@ -202,7 +168,6 @@ Vec2 MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::
     Vec2 overlapArea = Vec2(bb1->halfWidth + bb2->halfWidth - dx, bb1->halfHeight + bb2->halfHeight - dy);
     return overlapArea;
 }
-
 void MarioGame::Reselotion()
 {
     auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
@@ -241,7 +206,6 @@ void MarioGame::Reselotion()
         }
     }
 }
-
 void MarioGame::SyncShapeAndTransform()
 {
     for (auto& e : m_entityManager.GetEntities())
