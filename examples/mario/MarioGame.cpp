@@ -17,12 +17,12 @@ void MarioGame::Run()
     {
         m_entityManager.Update();
         m_frameCount ++;
-        
+
         SInput();
         SCalculateVelocity();
         SMovement();
         SDetectCollision();
-        Reselotion();
+        // Reselotion();
         SyncShapeAndTransform();
         SRender();
     }
@@ -48,6 +48,14 @@ void MarioGame::SpawnEnemies()
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow, 1));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(sizeY, sizeY)));
+
+    auto enemy2 = m_entityManager.AddEntity("enemy");
+    constexpr float sizeX2 = 100;
+    constexpr float sizeY2 = 100;
+    m_entityManager.AddComponent(std::make_shared<CTransform>(enemy2, Vec2(m_window.getSize().x / 4 + 100, m_window.getSize().y / 4)));
+    m_entityManager.AddComponent(std::make_shared<CShape>(enemy2, sf::Vector2f(sizeX2, sizeY2), sf::Color::Transparent, sf::Color::Yellow, 1));
+    m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy2));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy2, Vec2(sizeY2, sizeY2)));
 }
 
 void MarioGame::SInput()
@@ -129,14 +137,29 @@ void MarioGame::SMovement()
 }
 void MarioGame::SDetectCollision()
 {
-    auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
-    auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
-
-    auto overlapArea = RectVsRect(rectE, rectP);
-    if (overlapArea.x > 0 && overlapArea.y > 0)
-        m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
-    else
-        m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Yellow);
+    auto player = m_entityManager.GetComponent<CBoundingBox>("player");
+    for (auto& e : m_entityManager.GetEntities())
+    {
+        if (e->Tag() == "player") continue; // don't collide with self
+        auto bb = m_entityManager.GetComponent<CBoundingBox>(e);
+        if (bb && player)
+        {
+            auto overlapArea = RectVsRect(player, bb);
+            if (overlapArea.x > 0 && overlapArea.y > 0)
+            {
+                Reselotion(bb);
+            }
+        }
+    }
+    //
+    // auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
+    // auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
+    //
+    // auto overlapArea = RectVsRect(rectE, rectP);
+    // if (overlapArea.x > 0 && overlapArea.y > 0)
+    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Green);
+    // else
+    //     m_entityManager.GetComponent<CShape>("enemy")->rect.setOutlineColor(sf::Color::Yellow);
 }
 void MarioGame::SRender()
 {
@@ -206,6 +229,45 @@ void MarioGame::Reselotion()
         }
     }
 }
+
+void MarioGame::Reselotion(const std::shared_ptr<CBoundingBox> bb)
+{
+    // auto rectE = m_entityManager.GetComponent<CBoundingBox>("enemy");
+    auto rectP = m_entityManager.GetComponent<CBoundingBox>("player");
+    auto trP = m_entityManager.GetComponent<CTransform>("player");
+    // auto tr_bb = m_entityManager.GetComponent<CTransform>(bb->entity);
+
+    auto overlapArea = RectVsRect(bb, rectP);
+    if (overlapArea.x > 0 && overlapArea.y > 0)
+    {
+        auto previousOverlapArea = RectVsRect(bb, rectP, true);
+        if(previousOverlapArea.y > 0)
+        {
+            std::cout << "move in x direction to resolve the collision" << std::endl;
+            if (trP->GetPos().x > trP->GetPreviousPos().x)
+            {
+                trP->SetPos(trP->GetPos().x - overlapArea.x, trP->GetPos().y);
+            }
+            else
+            {
+                trP->SetPos(trP->GetPos().x + overlapArea.x, trP->GetPos().y);
+            }
+        }
+        if(previousOverlapArea.x > 0)
+        {
+            std::cout << "move in y direction to resolve the collision" << std::endl;
+            if (trP->GetPos().y > trP->GetPreviousPos().y)
+            {
+                trP->SetPos(trP->GetPos().x, trP->GetPos().y  - overlapArea.y);
+            }
+            else
+            {
+                trP->SetPos(trP->GetPos().x, trP->GetPos().y  + overlapArea.y);
+            }
+        }
+    }
+}
+
 void MarioGame::SyncShapeAndTransform()
 {
     for (auto& e : m_entityManager.GetEntities())
