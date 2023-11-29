@@ -13,6 +13,7 @@ private:
     int m_frameCount = 0;
 
     void SpawnPlayer();
+    void SpawnTiles();
     void SpawnEnemies();
     Vec2 RectVsRect(const std::shared_ptr<CBoundingBox>& rect1, const std::shared_ptr<CBoundingBox>& rect2, bool doForPreviousPos = false);
     void Reselotion();

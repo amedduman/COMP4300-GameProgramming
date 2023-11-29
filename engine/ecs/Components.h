@@ -26,6 +26,7 @@ public:
     CTransform(const std::shared_ptr<Entity>& entity, const Vec2& p = Vec2(0, 0)) : Component(entity, typeid(CTransform).name())
     {
         m_pos = p;
+        m_previousPos = p;
     }
     Vec2 GetPos()
     {

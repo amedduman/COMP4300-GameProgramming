@@ -11,6 +11,7 @@ MarioGame::MarioGame()
 void MarioGame::Run()
 {
     SpawnPlayer();
+    SpawnTiles();
     SpawnEnemies();
 
     while (m_window.isOpen())
@@ -39,6 +40,20 @@ void MarioGame::SpawnPlayer()
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(player, Vec2(sizeX, sizeY)));
 }
+
+void MarioGame::SpawnTiles()
+{
+    for (int i = 0; i < 12; ++i)
+    {
+        constexpr float sizeX = 64;
+        constexpr float sizeY = 64;
+        auto tile = m_entityManager.AddEntity("tile");
+        m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + sizeX/2, 500)));
+        m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
+        m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
+    }
+}
+
 void MarioGame::SpawnEnemies()
 {
     auto enemy = m_entityManager.AddEntity("enemy");
@@ -46,7 +61,7 @@ void MarioGame::SpawnEnemies()
     constexpr float sizeY = 200;
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(m_window.getSize().x / 2, m_window.getSize().y / 2)));
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow, 1));
-    m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
+    // m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(sizeY, sizeY)));
 
     auto enemy2 = m_entityManager.AddEntity("enemy");
@@ -54,7 +69,7 @@ void MarioGame::SpawnEnemies()
     constexpr float sizeY2 = 100;
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy2, Vec2(m_window.getSize().x / 4 + 100, m_window.getSize().y / 4)));
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy2, sf::Vector2f(sizeX2, sizeY2), sf::Color::Transparent, sf::Color::Yellow, 1));
-    m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy2));
+    // m_entityManager.AddComponent(std::make_shared<CVelocity>(enemy2));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy2, Vec2(sizeY2, sizeY2)));
 }
 
@@ -125,15 +140,22 @@ void MarioGame::SCalculateVelocity()
 }
 void MarioGame::SMovement()
 {
-    for (auto& e : m_entityManager.GetEntities())
+    auto player = m_entityManager.GetEntities("player");
+    auto tr = m_entityManager.GetComponent<CTransform>(player[0]);
+    auto vel = m_entityManager.GetComponent<CVelocity>(player[0]);
+    if (tr && vel)
     {
-        auto tr = m_entityManager.GetComponent<CTransform>(e);
-        auto vel = m_entityManager.GetComponent<CVelocity>(e);
-        if (tr && vel)
-        {
-            tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
-        }
+        tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
     }
+    // for (auto& e : m_entityManager.GetEntities())
+    // {
+    //     auto tr = m_entityManager.GetComponent<CTransform>(e);
+    //     auto vel = m_entityManager.GetComponent<CVelocity>(e);
+    //     if (tr && vel)
+    //     {
+    //         tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
+    //     }
+    // }
 }
 void MarioGame::SDetectCollision()
 {
