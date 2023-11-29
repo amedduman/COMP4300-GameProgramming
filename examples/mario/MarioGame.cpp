@@ -173,6 +173,18 @@ void MarioGame::SDetectCollision()
                     e->Destroy();
                     std::cout << "game over" << std::endl;
                 }
+                else if (e->Tag() == "special tile")
+                {
+                    auto tr = m_entityManager.GetComponent<CTransform>(player->entity);
+                    if(tr->GetPos().y > tr->GetPreviousPos().y)
+                    {
+                        Reselotion(bb);
+                    }
+                    else
+                    {
+                        e->Destroy();
+                    }
+                }
                 else
                 {
                     Reselotion(bb);
