@@ -21,5 +21,5 @@ size_t Entity::Id() const
 
 void Entity::Destroy()
 {
-    m_isAlive = true;
+    m_isAlive = false;
 }

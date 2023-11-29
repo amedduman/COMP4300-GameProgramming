@@ -148,9 +148,9 @@ void MarioGame::SCalculateVelocity()
 }
 void MarioGame::SMovement()
 {
-    auto player = m_entityManager.GetEntities("player");
-    auto tr = m_entityManager.GetComponent<CTransform>(player[0]);
-    auto vel = m_entityManager.GetComponent<CVelocity>(player[0]);
+    // auto player = m_entityManager.GetEntities("player");
+    auto tr = m_entityManager.GetComponent<CTransform>("player");
+    auto vel = m_entityManager.GetComponent<CVelocity>("player");
     if (tr && vel)
     {
         tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
@@ -168,7 +168,15 @@ void MarioGame::SDetectCollision()
             auto overlapArea = RectVsRect(player, bb);
             if (overlapArea.x > 0 && overlapArea.y > 0)
             {
-                Reselotion(bb);
+                if (e->Tag() == "enemy")
+                {
+                    e->Destroy();
+                    std::cout << "game over" << std::endl;
+                }
+                else
+                {
+                    Reselotion(bb);
+                }
             }
         }
     }
