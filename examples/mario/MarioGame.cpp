@@ -22,6 +22,7 @@ void MarioGame::Run()
         SInput();
         SCalculateVelocity();
         SMovement();
+        SApplyGravity();
         SDetectCollision();
         SyncShapeAndTransform();
         SRender();
@@ -38,6 +39,7 @@ void MarioGame::SpawnPlayer()
     m_entityManager.AddComponent(std::make_shared<CMarioInput>(player));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(player, Vec2(sizeX, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CGravity>(player, 9));
 }
 void MarioGame::SpawnTiles()
 {
@@ -156,6 +158,20 @@ void MarioGame::SMovement()
         tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
     }
 }
+
+void MarioGame::SApplyGravity()
+{
+
+    auto tr = m_entityManager.GetComponent<CTransform>("player");
+    auto gravity = m_entityManager.GetComponent<CGravity>("player");
+    if (tr && gravity)
+    {
+
+        tr->SetPos(tr->GetPos().x, tr->GetPos().y + gravity->GetGravity());
+    }
+
+}
+
 void MarioGame::SDetectCollision()
 {
     auto player = m_entityManager.GetComponent<CBoundingBox>("player");

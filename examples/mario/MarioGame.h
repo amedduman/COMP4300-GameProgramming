@@ -23,6 +23,7 @@ private:
     void SInput();
     void SCalculateVelocity();
     void SMovement();
+    void SApplyGravity();
     void SDetectCollision();
     void SRender();
 };

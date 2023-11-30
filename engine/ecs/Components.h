@@ -105,6 +105,21 @@ public:
     }
 };
 
+class CGravity : public Component
+{
+public:
+    CGravity(const std::shared_ptr<Entity>& entity, const float gravity) : Component(entity, typeid(CGravity).name())
+    {
+        m_gravity = gravity;
+    }
+    float GetGravity()
+    {
+        return m_gravity;
+    }
+private:
+    float m_gravity = 9;
+};
+
 // class CScore
 // {
 // public:
