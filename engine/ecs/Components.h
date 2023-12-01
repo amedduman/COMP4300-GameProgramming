@@ -44,6 +44,9 @@ public:
     {
         m_previousPos = m_pos;
         m_pos = pos;
+        std::cout << m_previousPos.y << std::endl;
+        std::cout << m_pos.y << std::endl;
+
     }
 private:
     Vec2 m_pos;
@@ -93,6 +96,7 @@ public:
     bool moveDown = false;
     bool moveRight = false;
     bool moveLeft = false;
+    bool jump = false;
     bool fire = false;
 };
 
