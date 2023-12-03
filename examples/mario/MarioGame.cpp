@@ -199,7 +199,6 @@ void MarioGame::SDetectCollision()
     for (auto& e : m_entityManager.GetEntities())
     {
         if (e->Tag() == "player") continue; // don't collide with self
-        if(e->Tag() == "bullet") continue; //
         auto bb = m_entityManager.GetComponent<CBoundingBox>(e);
         if (bb && player)
         {
@@ -222,6 +221,10 @@ void MarioGame::SDetectCollision()
                     {
                         e->Destroy();
                     }
+                }
+                else if (e->Tag() == "bullet")
+                {
+                    // ignore
                 }
                 else
                 {
