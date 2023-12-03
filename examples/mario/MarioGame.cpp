@@ -82,7 +82,19 @@ void MarioGame::SpawnEnemies()
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy2, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Red, 1));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy2, Vec2(sizeY, sizeY)));
 }
+void MarioGame::SpawnBullet()
+{
+    constexpr float sizeX = 16;
+    constexpr float sizeY = 16;
 
+    auto playerPos = m_entityManager.GetComponent<CTransform>("player")->GetPos();
+
+    auto bullet = m_entityManager.AddEntity("bullet");
+    m_entityManager.AddComponent(std::make_shared<CTransform>(bullet, playerPos));
+    m_entityManager.AddComponent(std::make_shared<CShape>(bullet, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Green, 1));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(bullet, Vec2(sizeY, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CVelocity>(bullet, Vec2(10, 0)));
+}
 void MarioGame::SInput()
 {
     sf::Event event {};
@@ -110,6 +122,7 @@ void MarioGame::SInput()
                 input->moveRight = true;
             }
             if(event.key.code == sf::Keyboard::Space) input->jump = true;
+            if(event.key.code == sf::Keyboard::J) SpawnBullet();
             if(event.key.code == sf::Keyboard::Escape)
             {
                 m_window.close();
@@ -152,12 +165,19 @@ void MarioGame::SCalculateVelocity()
 }
 void MarioGame::SMovement()
 {
-    auto tr = m_entityManager.GetComponent<CTransform>("player");
-    auto vel = m_entityManager.GetComponent<CVelocity>("player");
-    auto gravity = m_entityManager.GetComponent<CGravity>("player");
-    if (tr && vel)
+    for(auto& e : m_entityManager.GetEntities())
     {
-        tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+        auto tr = m_entityManager.GetComponent<CTransform>(e);
+        auto vel = m_entityManager.GetComponent<CVelocity>(e);
+        auto gravity = m_entityManager.GetComponent<CGravity>(e);
+        if (tr && vel && gravity)
+        {
+            tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+        }
+        else if (tr && vel)
+        {
+            tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y);
+        }
     }
 }
 void MarioGame::SApplyGravity()
@@ -179,6 +199,7 @@ void MarioGame::SDetectCollision()
     for (auto& e : m_entityManager.GetEntities())
     {
         if (e->Tag() == "player") continue; // don't collide with self
+        if(e->Tag() == "bullet") continue; //
         auto bb = m_entityManager.GetComponent<CBoundingBox>(e);
         if (bb && player)
         {
@@ -249,10 +270,6 @@ void MarioGame::Reselotion(const std::shared_ptr<CBoundingBox> bb)
     if (overlapArea.x > 0 && overlapArea.y > 0)
     {
         auto previousOverlapArea = RectVsRect(bb, rectP, true);
-        std::cout<< "previous overlap: " << previousOverlapArea.x << ", " << previousOverlapArea.y << std::endl;
-        std::cout<< "current overlap: " << overlapArea.x << ", " << overlapArea.y << std::endl;
-        std::cout << "previous tr: " << trP->GetPreviousPos().x << ", " << trP->GetPreviousPos().y << std::endl;
-        std::cout << "current tr: " << trP->GetPos().x << ", " << trP->GetPos().y << std::endl;
         if(previousOverlapArea.y > 0)
         {
             // move in x direction to resolve the collision
@@ -270,12 +287,10 @@ void MarioGame::Reselotion(const std::shared_ptr<CBoundingBox> bb)
             // move in y direction to resolve the collision
             if (trP->GetPos().y > trP->GetPreviousPos().y)
             {
-                std::cout << "move up by " << overlapArea.y << std::endl;
                 trP->SetPos(trP->GetPos().x, trP->GetPos().y  - overlapArea.y);
             }
             else
             {
-                std::cout << "move down by " << overlapArea.y << std::endl;
                 trP->SetPos(trP->GetPos().x, trP->GetPos().y  + overlapArea.y);
             }
         }

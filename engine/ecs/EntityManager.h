@@ -43,7 +43,7 @@ const std::shared_ptr<T>& EntityManager::GetComponent(const std::shared_ptr<Enti
             if (cmpPtr->entity->Id() == entity->Id()) return std::dynamic_pointer_cast<T>(cmpPtr);
         }
     }
-    std::cout << "can't find " << typeid(T).name() << "component for " << "entity " << "tag: " << entity->Tag() << ", id: " << entity->Id() << std::endl;
+    // std::cout << "can't find " << typeid(T).name() << "component for " << "entity " << "tag: " << entity->Tag() << ", id: " << entity->Id() << std::endl;
     return nullptr;
 }
 

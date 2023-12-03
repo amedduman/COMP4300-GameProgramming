@@ -15,6 +15,7 @@ private:
     void SpawnPlayer();
     void SpawnTiles();
     void SpawnEnemies();
+    void SpawnBullet();
     Vec2 RectVsRect(const std::shared_ptr<CBoundingBox>& rect1, const std::shared_ptr<CBoundingBox>& rect2, bool doForPreviousPos = false);
     void Reselotion();
     void Reselotion(std::shared_ptr<CBoundingBox> bb);

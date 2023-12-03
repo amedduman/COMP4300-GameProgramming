@@ -44,9 +44,6 @@ public:
     {
         m_previousPos = m_pos;
         m_pos = pos;
-        std::cout << m_previousPos.y << std::endl;
-        std::cout << m_pos.y << std::endl;
-
     }
 private:
     Vec2 m_pos;
@@ -104,8 +101,9 @@ class CVelocity : public Component
 {
 public:
     Vec2 velocity;
-    explicit CVelocity(const std::shared_ptr<Entity>& entity) : Component(entity, typeid(CVelocity).name())
+    explicit CVelocity(const std::shared_ptr<Entity>& entity, Vec2 vel = Vec2(0,0)) : Component(entity, typeid(CVelocity).name())
     {
+        velocity = vel;
     }
 };
 
