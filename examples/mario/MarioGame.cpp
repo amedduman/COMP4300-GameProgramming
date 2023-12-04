@@ -66,6 +66,11 @@ void MarioGame::SpawnTiles()
     m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(292, 300)));
     m_entityManager.AddComponent(std::make_shared<CShape>(specialTile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(specialTile, Vec2(sizeX, sizeY)));
+
+    auto tile = m_entityManager.AddEntity("tile");
+    m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(292, 424)));
+    m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
 }
 void MarioGame::SpawnEnemies()
 {
@@ -244,6 +249,20 @@ void MarioGame::SDetectCollision()
                     b->Destroy();
                     goto exitloop; // for this particular frame we want to exit form loop because the current
                 }
+        }
+
+        for (auto& e : m_entityManager.GetEntities("tile"))
+        {
+            auto bulletBb = m_entityManager.GetComponent<CBoundingBox>(b);
+            auto tileBb = m_entityManager.GetComponent<CBoundingBox>(e);
+            if ((bulletBb && tileBb) == false ) std::cout << "can't get required components for detecting collision between bullet  and enemy" << std::endl;
+            auto overlapArea = RectVsRect(bulletBb, tileBb);
+            if (overlapArea.x > 0 && overlapArea.y > 0)
+            {
+                e->Destroy();
+                b->Destroy();
+                goto exitloop; // for this particular frame we want to exit form loop because the current
+            }
         }
     }
     exitloop:
