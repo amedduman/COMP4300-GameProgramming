@@ -198,7 +198,7 @@ void MarioGame::SDetectCollision()
     auto player = m_entityManager.GetComponent<CBoundingBox>("player");
     for (auto& e : m_entityManager.GetEntities())
     {
-        if (e->Tag() == "player") continue; // don't collide with self
+        if (e->Tag() == "player" || e->Tag() == "bullet") continue; // don't collide with self and bullet
         auto bb = m_entityManager.GetComponent<CBoundingBox>(e);
         if (bb && player)
         {
@@ -222,10 +222,6 @@ void MarioGame::SDetectCollision()
                         e->Destroy();
                     }
                 }
-                else if (e->Tag() == "bullet")
-                {
-                    // ignore
-                }
                 else
                 {
                     Reselotion(bb);
@@ -233,6 +229,24 @@ void MarioGame::SDetectCollision()
             }
         }
     }
+
+    for (auto& b : m_entityManager.GetEntities("bullet"))
+    {
+        for (auto& e : m_entityManager.GetEntities("enemy"))
+        {
+            auto bulletBb = m_entityManager.GetComponent<CBoundingBox>(b);
+            auto enemyBb = m_entityManager.GetComponent<CBoundingBox>(e);
+            if ((bulletBb && enemyBb) == false ) std::cout << "can't get required components for detecting collision between bullet  and enemy" << std::endl;
+            auto overlapArea = RectVsRect(bulletBb, enemyBb);
+                if (overlapArea.x > 0 && overlapArea.y > 0)
+                {
+                    e->Destroy();
+                    b->Destroy();
+                    goto exitloop; // for this particular frame we want to exit form loop because the current
+                }
+        }
+    }
+    exitloop:
 }
 void MarioGame::SRender()
 {
