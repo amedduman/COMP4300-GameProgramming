@@ -50,6 +50,29 @@ private:
     Vec2 m_previousPos;
 };
 
+class CSprite : public Component
+{
+public:
+    CSprite(const std::shared_ptr<Entity>& entity, const sf::Texture& in_texture, sf::IntRect rect, Vec2 origin) : Component(entity, typeid(CSprite).name())
+    {
+        sprite.setTexture(in_texture);
+        sprite.setOrigin(origin.x, origin.y);
+        sprite.setTextureRect(rect);
+    }
+
+    sf::Sprite GetSprite()
+    {
+        return sprite;
+    }
+
+    void SetPos(Vec2 pos)
+    {
+        sprite.setPosition(pos.x, pos.y);
+    }
+private:
+    sf::Sprite sprite;
+};
+
 
 class CShape : public Component
 {

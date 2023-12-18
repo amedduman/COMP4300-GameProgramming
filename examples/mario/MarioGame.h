@@ -20,6 +20,7 @@ private:
     void Reselotion();
     void Reselotion(std::shared_ptr<CBoundingBox> bb);
     void SyncShapeAndTransform();
+    void SyncSpriteAndTransform();
 
     void SInput();
     void SCalculateVelocity();
@@ -27,4 +28,6 @@ private:
     void SApplyGravity();
     void SDetectCollision();
     void SRender();
+
+    sf::Texture playerTex;
 };

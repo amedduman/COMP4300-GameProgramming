@@ -25,6 +25,7 @@ void MarioGame::Run()
         SMovement();
         SDetectCollision();
         SyncShapeAndTransform();
+        SyncSpriteAndTransform();
         SRender();
     }
 }
@@ -40,6 +41,13 @@ void MarioGame::SpawnPlayer()
     m_entityManager.AddComponent(std::make_shared<CVelocity>(player));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(player, Vec2(sizeX, sizeY)));
     m_entityManager.AddComponent(std::make_shared<CGravity>(player, 9));
+
+    if (!playerTex.loadFromFile("../examples/mario/run.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    playerTex.setSmooth(true);
+    m_entityManager.AddComponent(std::make_shared<CSprite>(player, playerTex, sf::IntRect(0,0,48,48), Vec2(24,24)));
 }
 void MarioGame::SpawnTiles()
 {
@@ -274,6 +282,10 @@ void MarioGame::SRender()
     {
         m_window.draw(e->rect);
     }
+    for (auto& e : m_entityManager.GetComponents<CSprite>())
+    {
+        m_window.draw(e->GetSprite());
+    }
     m_window.display();
 }
 
@@ -341,6 +353,19 @@ void MarioGame::SyncShapeAndTransform()
         if (tr && shape)
         {
             shape->rect.setPosition(tr->GetPos().x, tr->GetPos().y);
+        }
+    }
+}
+
+void MarioGame::SyncSpriteAndTransform()
+{
+    for (auto& e : m_entityManager.GetEntities())
+    {
+        auto tr = m_entityManager.GetComponent<CTransform>(e);
+        auto sprite = m_entityManager.GetComponent<CSprite>(e);
+        if (tr && sprite)
+        {
+            sprite->SetPos(tr->GetPos());
         }
     }
 }
