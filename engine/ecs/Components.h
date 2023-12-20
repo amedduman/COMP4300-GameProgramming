@@ -73,7 +73,6 @@ public:
             sprite.setTexture(texture);
             currentFrame++;
             currentFrame %= frameCount;
-            std::cout << currentFrame << std::endl;
             sprite.setTextureRect(frames[currentFrame]);
             gameFrameCount = 0;
         }

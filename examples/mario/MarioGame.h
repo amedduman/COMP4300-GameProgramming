@@ -32,4 +32,6 @@ private:
 
     sf::Texture playerRunTex;
     sf::Texture playerIdleTex;
+    sf::Texture tilemapTex;
+    sf::Texture hazardTex;
 };

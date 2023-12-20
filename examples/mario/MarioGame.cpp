@@ -84,8 +84,14 @@ void MarioGame::SpawnPlayer()
 }
 void MarioGame::SpawnTiles()
 {
-    constexpr float sizeX = 64;
-    constexpr float sizeY = 64;
+    if (!tilemapTex.loadFromFile("../examples/mario/tilemap.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    tilemapTex.setSmooth(true);
+
+    constexpr float sizeX = 32;
+    constexpr float sizeY = 32;
 
     for (int i = 0; i < 12; ++i)
     {
@@ -93,6 +99,7 @@ void MarioGame::SpawnTiles()
         m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + sizeX/2, 500)));
         m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
         m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
+        m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
     }
 
     for (int i = 0; i < 3; ++i)
@@ -101,6 +108,8 @@ void MarioGame::SpawnTiles()
         m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + 100, 300)));
         m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
         m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
+        m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
+
     }
 
     auto specialTile = m_entityManager.AddEntity("special tile");
@@ -115,18 +124,27 @@ void MarioGame::SpawnTiles()
 }
 void MarioGame::SpawnEnemies()
 {
-    constexpr float sizeX = 64;
-    constexpr float sizeY = 64;
+    if (!hazardTex.loadFromFile("../examples/mario/hazard.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    hazardTex.setSmooth(true);
+
+    constexpr float sizeX = 32;
+    constexpr float sizeY = 32;
 
     auto enemy = m_entityManager.AddEntity("enemy");
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(450, 436)));
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Red, 1));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(sizeY, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(enemy, hazardTex, sf::IntRect(0,0, 32, 32), Vec2(16,16)));
 
     auto enemy2 = m_entityManager.AddEntity("enemy");
     m_entityManager.AddComponent(std::make_shared<CTransform>(enemy2, Vec2(650, 436)));
     m_entityManager.AddComponent(std::make_shared<CShape>(enemy2, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Red, 1));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy2, Vec2(sizeY, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(enemy2, hazardTex, sf::IntRect(0,0, 32, 32), Vec2(16,16)));
+
 }
 void MarioGame::SpawnBullet()
 {
