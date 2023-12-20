@@ -27,7 +27,9 @@ private:
     void SMovement();
     void SApplyGravity();
     void SDetectCollision();
+    void SAnimate();
     void SRender();
 
-    sf::Texture playerTex;
+    sf::Texture playerRunTex;
+    sf::Texture playerIdleTex;
 };

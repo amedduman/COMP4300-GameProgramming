@@ -24,6 +24,7 @@ void MarioGame::Run()
         // SApplyGravity();
         SMovement();
         SDetectCollision();
+        SAnimate();
         SyncShapeAndTransform();
         SyncSpriteAndTransform();
         SRender();
@@ -42,12 +43,44 @@ void MarioGame::SpawnPlayer()
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(player, Vec2(sizeX, sizeY)));
     m_entityManager.AddComponent(std::make_shared<CGravity>(player, 9));
 
-    if (!playerTex.loadFromFile("../examples/mario/run.png"))
+    if (!playerRunTex.loadFromFile("../examples/mario/run.png"))
     {
         std::cout << "error while loading image" << std::endl;
     }
-    playerTex.setSmooth(true);
-    m_entityManager.AddComponent(std::make_shared<CSprite>(player, playerTex, sf::IntRect(0,0,48,48), Vec2(24,24)));
+    playerRunTex.setSmooth(true);
+    if (!playerIdleTex.loadFromFile("../examples/mario/idle.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    playerIdleTex.setSmooth(true);
+    m_entityManager.AddComponent(std::make_shared<CSprite>(player, playerRunTex, sf::IntRect(0,0,48, 48), Vec2(24,24)));
+
+    auto sprite = m_entityManager.GetComponent<CSprite>(player);
+
+    std::vector<sf::IntRect> runFrames;
+    runFrames.emplace_back(0,0,48,48);
+    runFrames.emplace_back(48,0,48,48);
+    runFrames.emplace_back(48*2,0,48,48);
+    runFrames.emplace_back(48*3,0,48,48);
+    runFrames.emplace_back(48*4,0,48,48);
+    runFrames.emplace_back(48*5,0,48,48);
+    runFrames.emplace_back(48*6,0,48,48);
+    runFrames.emplace_back(48*7,0,48,48);
+
+    std::vector<sf::IntRect> idleFrames;
+    idleFrames.emplace_back(0,0,48,48);
+    idleFrames.emplace_back(48,0,48,48);
+    idleFrames.emplace_back(48*2,0,48,48);
+    idleFrames.emplace_back(48*3,0,48,48);
+    idleFrames.emplace_back(48*4,0,48,48);
+    idleFrames.emplace_back(48*5,0,48,48);
+    idleFrames.emplace_back(48*6,0,48,48);
+    idleFrames.emplace_back(48*7,0,48,48);
+    idleFrames.emplace_back(48*8,0,48,48);
+    idleFrames.emplace_back(48*9,0,48,48);
+
+    sprite->AddAnimation(playerRunTex, runFrames, "run", 5);
+    sprite->AddAnimation(playerIdleTex, runFrames, "idle", 5);
 }
 void MarioGame::SpawnTiles()
 {
@@ -169,7 +202,7 @@ void MarioGame::SCalculateVelocity()
     auto playerVel = m_entityManager.GetComponent<CVelocity>("player");
     auto playerInp = m_entityManager.GetComponent<CMarioInput>("player");
     playerVel->velocity = Vec2(0,0);
-    constexpr float speed = 10;
+    constexpr float speed = 1;
     if (playerInp->moveUP) playerVel->velocity.y = -speed;
     if (playerInp->moveDown) playerVel->velocity.y = speed;
     if (playerInp->moveRight) playerVel->velocity.x = speed;
@@ -275,6 +308,19 @@ void MarioGame::SDetectCollision()
     }
     exitloop:
 }
+
+void MarioGame::SAnimate()
+{
+    auto playerSprite = m_entityManager.GetComponent<CSprite>("player");
+    auto playerTr = m_entityManager.GetComponent<CTransform>("player");
+    auto playerVel = m_entityManager.GetComponent<CVelocity>("player");
+
+    if (playerVel->velocity.x != 0 || playerVel->velocity.y != 0)
+        playerSprite->PLayAnimation("run");
+    else
+        playerSprite->PLayAnimation("idle");
+}
+
 void MarioGame::SRender()
 {
     m_window.clear(sf::Color::Black);

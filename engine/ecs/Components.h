@@ -50,14 +50,61 @@ private:
     Vec2 m_previousPos;
 };
 
+class Animation
+{
+public:
+    Animation(const sf::Texture& in_texture, const std::vector<sf::IntRect>& in_frames, int in_animSpeed, int in_currentFrame, int in_frameCount)
+    {
+        texture = in_texture;
+        frames = in_frames;
+        animSpeed = in_animSpeed;
+        currentFrame = in_currentFrame;
+        frameCount = in_frameCount;
+    }
+    Animation()
+    {
+
+    }
+    void Play(sf::Sprite& sprite)
+    {
+        gameFrameCount++;
+        if(animSpeed < gameFrameCount)
+        {
+            sprite.setTexture(texture);
+            currentFrame++;
+            currentFrame %= frameCount;
+            std::cout << currentFrame << std::endl;
+            sprite.setTextureRect(frames[currentFrame]);
+            gameFrameCount = 0;
+        }
+    }
+private:
+    sf::Texture texture;
+    std::vector<sf::IntRect> frames;
+    int currentFrame;
+    int frameCount;
+    int animSpeed;
+    int gameFrameCount;
+};
+
 class CSprite : public Component
 {
 public:
-    CSprite(const std::shared_ptr<Entity>& entity, const sf::Texture& in_texture, sf::IntRect rect, Vec2 origin) : Component(entity, typeid(CSprite).name())
+    CSprite(const std::shared_ptr<Entity>& entity, const sf::Texture& in_texture, const sf::IntRect rect, const Vec2 origin) : Component(entity, typeid(CSprite).name())
     {
         sprite.setTexture(in_texture);
         sprite.setOrigin(origin.x, origin.y);
         sprite.setTextureRect(rect);
+    }
+
+    void AddAnimation(const sf::Texture& in_texture, const std::vector<sf::IntRect>& in_frames, const std::string& animName, int animSpeed)
+    {
+        animations[animName] = Animation(in_texture, in_frames, animSpeed, 0, static_cast<int>(in_frames.size()));
+    }
+
+    void PLayAnimation(const std::string& animName)
+    {
+        animations[animName].Play(sprite);
     }
 
     sf::Sprite GetSprite()
@@ -71,8 +118,10 @@ public:
     }
 private:
     sf::Sprite sprite;
+    // std::vector<sf::IntRect> frames;
+    // std::vector<Animation> animations;
+    std::map<std::string, Animation> animations;
 };
-
 
 class CShape : public Component
 {
