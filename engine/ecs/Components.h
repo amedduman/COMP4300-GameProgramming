@@ -107,7 +107,7 @@ public:
         animations[animName].Play(sprite);
     }
 
-    sf::Sprite GetSprite()
+    sf::Sprite& GetSprite()
     {
         return sprite;
     }

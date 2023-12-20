@@ -53,7 +53,7 @@ void MarioGame::SpawnPlayer()
         std::cout << "error while loading image" << std::endl;
     }
     playerIdleTex.setSmooth(true);
-    m_entityManager.AddComponent(std::make_shared<CSprite>(player, playerRunTex, sf::IntRect(0,0,48, 48), Vec2(24,24)));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(player, playerRunTex, sf::IntRect(0,0,48, 48), Vec2(28,28)));
 
     auto sprite = m_entityManager.GetComponent<CSprite>(player);
 
@@ -314,6 +314,11 @@ void MarioGame::SAnimate()
     auto playerSprite = m_entityManager.GetComponent<CSprite>("player");
     auto playerTr = m_entityManager.GetComponent<CTransform>("player");
     auto playerVel = m_entityManager.GetComponent<CVelocity>("player");
+
+    if (playerVel->velocity.x > 0)
+        playerSprite->GetSprite().setScale(1, 1);
+    else if(playerVel->velocity.x < 0)
+        playerSprite->GetSprite().setScale(-1, 1);
 
     if (playerVel->velocity.x != 0 || playerVel->velocity.y != 0)
         playerSprite->PLayAnimation("run");
