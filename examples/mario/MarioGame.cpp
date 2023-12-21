@@ -90,6 +90,7 @@ void MarioGame::SpawnTiles()
     }
     tilemapTex.setSmooth(true);
 
+
     constexpr float sizeX = 32;
     constexpr float sizeY = 32;
 
@@ -112,10 +113,17 @@ void MarioGame::SpawnTiles()
 
     }
 
+    if (!specialTileTex.loadFromFile("../examples/mario/specialTile.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    specialTileTex.setSmooth(true);
+
     auto specialTile = m_entityManager.AddEntity("special tile");
-    m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(292, 300)));
+    m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(198, 300)));
     m_entityManager.AddComponent(std::make_shared<CShape>(specialTile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(specialTile, Vec2(sizeX, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(specialTile, specialTileTex, sf::IntRect(0,0,32,32), Vec2(16,16)));
 
     auto tile = m_entityManager.AddEntity("tile");
     m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(292, 424)));
@@ -148,6 +156,12 @@ void MarioGame::SpawnEnemies()
 }
 void MarioGame::SpawnBullet()
 {
+    if (!bulletTex.loadFromFile("../examples/mario/bullet.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    bulletTex.setSmooth(true);
+
     constexpr float sizeX = 16;
     constexpr float sizeY = 16;
 
@@ -156,6 +170,7 @@ void MarioGame::SpawnBullet()
     auto bullet = m_entityManager.AddEntity("bullet");
     m_entityManager.AddComponent(std::make_shared<CTransform>(bullet, playerPos));
     m_entityManager.AddComponent(std::make_shared<CShape>(bullet, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Green, 1));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(bullet, bulletTex, sf::IntRect(0,4,8,8), Vec2(4,4)));
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(bullet, Vec2(sizeY, sizeY)));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(bullet, Vec2(10, 0)));
 }
@@ -346,7 +361,7 @@ void MarioGame::SAnimate()
 
 void MarioGame::SRender()
 {
-    m_window.clear(sf::Color::Black);
+    m_window.clear(sf::Color(25, 35,25));
     for (auto& e : m_entityManager.GetComponents<CShape>())
     {
         m_window.draw(e->rect);
