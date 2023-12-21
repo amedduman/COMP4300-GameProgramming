@@ -27,6 +27,7 @@ void MarioGame::Run()
         SAnimate();
         SyncShapeAndTransform();
         SyncSpriteAndTransform();
+        MoveCamera();
         SRender();
     }
 }
@@ -251,7 +252,21 @@ void MarioGame::SMovement()
         auto gravity = m_entityManager.GetComponent<CGravity>(e);
         if (tr && vel && gravity)
         {
-            tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+            if(e->Tag() == "player")
+            {
+                if(tr->GetPos().x <= 0)
+                {
+                    tr->SetPos(1 , tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+                }
+                else
+                {
+                    tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+                }
+            }
+            else
+            {
+                tr->SetPos(tr->GetPos().x + vel->velocity.x, tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+            }
         }
         else if (tr && vel)
         {
@@ -372,7 +387,6 @@ void MarioGame::SRender()
     }
     m_window.display();
 }
-
 Vec2 MarioGame::RectVsRect(const std::shared_ptr<CBoundingBox>& bb1, const std::shared_ptr<CBoundingBox>& bb2, bool doForPreviousPos)
 {
     Vec2 bb1pos;
@@ -452,4 +466,13 @@ void MarioGame::SyncSpriteAndTransform()
             sprite->SetPos(tr->GetPos());
         }
     }
+}
+void MarioGame::MoveCamera()
+{
+    auto playerTr = m_entityManager.GetComponent<CTransform>("player");
+    auto offsetX = playerTr->GetPos().x - 100;
+    if (offsetX < 0) offsetX = 0;
+    sf::View view(sf::FloatRect(0,0, 800, 600));
+    view.move(offsetX,0);
+    m_window.setView(view);
 }

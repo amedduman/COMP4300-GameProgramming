@@ -21,6 +21,7 @@ private:
     void Reselotion(std::shared_ptr<CBoundingBox> bb);
     void SyncShapeAndTransform();
     void SyncSpriteAndTransform();
+    void MoveCamera();
 
     void SInput();
     void SCalculateVelocity();
