@@ -12,7 +12,6 @@ void MarioGame::Run()
 {
     SpawnPlayer();
     SpawnTiles();
-    SpawnEnemies();
 
     while (m_window.isOpen())
     {
@@ -95,6 +94,7 @@ void MarioGame::SpawnTiles()
     constexpr float sizeX = 32;
     constexpr float sizeY = 32;
 
+    // ground tiles and hazards
     for (int i = 0; i < 12; ++i)
     {
         auto tile = m_entityManager.AddEntity("tile");
@@ -102,58 +102,85 @@ void MarioGame::SpawnTiles()
         m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
         m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
         m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
-    }
 
-    for (int i = 0; i < 3; ++i)
+        if(i == 8 || i == 9)
+        {
+            if (!hazardTex.loadFromFile("../examples/mario/hazard.png"))
+            {
+                std::cout << "error while loading image" << std::endl;
+            }
+            hazardTex.setSmooth(true);
+
+            constexpr float enemySizeX = 32;
+            constexpr float enemySizeY = 32;
+
+            auto enemy = m_entityManager.AddEntity("enemy");
+            m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(enemySizeX * i + enemySizeX/2, 500 - 32)));
+            m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(enemySizeX, enemySizeY), sf::Color::Transparent, sf::Color::Red, 1));
+            m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(enemySizeX, enemySizeY)));
+            m_entityManager.AddComponent(std::make_shared<CSprite>(enemy, hazardTex, sf::IntRect(0,0, 32, 32), Vec2(16,16)));
+        }
+    }
+    for (int i = 0; i < 18; ++i)
     {
         auto tile = m_entityManager.AddEntity("tile");
-        m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + 100, 300)));
+        m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + 550, 500)));
         m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
         m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
         m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
-
     }
 
-    if (!specialTileTex.loadFromFile("../examples/mario/specialTile.png"))
+    // hanging tiles
+    for (int i = 0; i < 4; ++i)
     {
-        std::cout << "error while loading image" << std::endl;
+        if (i < 3)
+        {
+            auto tile = m_entityManager.AddEntity("tile");
+            m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + 50, 400)));
+            m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
+            m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
+            m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
+        }
+        else
+        {
+            if (!specialTileTex.loadFromFile("../examples/mario/specialTile.png"))
+            {
+                std::cout << "error while loading image" << std::endl;
+            }
+            specialTileTex.setSmooth(true);
+
+            auto specialTile = m_entityManager.AddEntity("special tile");
+            m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(sizeX * i + 50, 400)));
+            m_entityManager.AddComponent(std::make_shared<CShape>(specialTile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow));
+            m_entityManager.AddComponent(std::make_shared<CBoundingBox>(specialTile, Vec2(sizeX, sizeY)));
+            m_entityManager.AddComponent(std::make_shared<CSprite>(specialTile, specialTileTex, sf::IntRect(0,0,32,32), Vec2(16,16)));
+        }
     }
-    specialTileTex.setSmooth(true);
-
-    auto specialTile = m_entityManager.AddEntity("special tile");
-    m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(198, 300)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(specialTile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow));
-    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(specialTile, Vec2(sizeX, sizeY)));
-    m_entityManager.AddComponent(std::make_shared<CSprite>(specialTile, specialTileTex, sf::IntRect(0,0,32,32), Vec2(16,16)));
-
-    auto tile = m_entityManager.AddEntity("tile");
-    m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(292, 424)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
-    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
-}
-void MarioGame::SpawnEnemies()
-{
-    if (!hazardTex.loadFromFile("../examples/mario/hazard.png"))
+    for (int i = 0; i < 4; ++i)
     {
-        std::cout << "error while loading image" << std::endl;
+        if (i < 3)
+        {
+            auto tile = m_entityManager.AddEntity("tile");
+            m_entityManager.AddComponent(std::make_shared<CTransform>(tile, Vec2(sizeX * i + 650, 400)));
+            m_entityManager.AddComponent(std::make_shared<CShape>(tile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
+            m_entityManager.AddComponent(std::make_shared<CBoundingBox>(tile, Vec2(sizeX, sizeY)));
+            m_entityManager.AddComponent(std::make_shared<CSprite>(tile,tilemapTex, sf::IntRect(32,64,32,32), Vec2(16,16)));
+        }
+        else
+        {
+            if (!specialTileTex.loadFromFile("../examples/mario/specialTile.png"))
+            {
+                std::cout << "error while loading image" << std::endl;
+            }
+            specialTileTex.setSmooth(true);
+
+            auto specialTile = m_entityManager.AddEntity("special tile");
+            m_entityManager.AddComponent(std::make_shared<CTransform>(specialTile, Vec2(sizeX * i + 650, 400)));
+            m_entityManager.AddComponent(std::make_shared<CShape>(specialTile, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Yellow));
+            m_entityManager.AddComponent(std::make_shared<CBoundingBox>(specialTile, Vec2(sizeX, sizeY)));
+            m_entityManager.AddComponent(std::make_shared<CSprite>(specialTile, specialTileTex, sf::IntRect(0,0,32,32), Vec2(16,16)));
+        }
     }
-    hazardTex.setSmooth(true);
-
-    constexpr float sizeX = 32;
-    constexpr float sizeY = 32;
-
-    auto enemy = m_entityManager.AddEntity("enemy");
-    m_entityManager.AddComponent(std::make_shared<CTransform>(enemy, Vec2(450, 436)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(enemy, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Red, 1));
-    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy, Vec2(sizeY, sizeY)));
-    m_entityManager.AddComponent(std::make_shared<CSprite>(enemy, hazardTex, sf::IntRect(0,0, 32, 32), Vec2(16,16)));
-
-    auto enemy2 = m_entityManager.AddEntity("enemy");
-    m_entityManager.AddComponent(std::make_shared<CTransform>(enemy2, Vec2(650, 436)));
-    m_entityManager.AddComponent(std::make_shared<CShape>(enemy2, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent, sf::Color::Red, 1));
-    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(enemy2, Vec2(sizeY, sizeY)));
-    m_entityManager.AddComponent(std::make_shared<CSprite>(enemy2, hazardTex, sf::IntRect(0,0, 32, 32), Vec2(16,16)));
-
 }
 void MarioGame::SpawnBullet()
 {
@@ -201,7 +228,18 @@ void MarioGame::SInput()
             {
                 input->moveRight = true;
             }
-            if(event.key.code == sf::Keyboard::Space) input->jump = true;
+            if(event.key.code == sf::Keyboard::Space)
+            {
+                m_countOfJumpInputPressed++;
+                if(m_countOfJumpInputPressed <= 1)
+                {
+                    input->jump = true;
+                }
+                else
+                {
+                    input->jump = false;
+                }
+            }
             if(event.key.code == sf::Keyboard::J) SpawnBullet();
             if(event.key.code == sf::Keyboard::Escape)
             {
@@ -227,7 +265,11 @@ void MarioGame::SInput()
             {
                 input->moveRight = false;
             }
-            if(event.key.code == sf::Keyboard::Space) input->jump = false;
+            if(event.key.code == sf::Keyboard::Space)
+            {
+                input->jump = false;
+                m_countOfJumpInputPressed = 0;
+            }
         }
     }
 }
@@ -236,12 +278,15 @@ void MarioGame::SCalculateVelocity()
     auto playerVel = m_entityManager.GetComponent<CVelocity>("player");
     auto playerInp = m_entityManager.GetComponent<CMarioInput>("player");
     playerVel->velocity = Vec2(0,0);
-    constexpr float speed = 1;
+    constexpr float speed = 6;
     if (playerInp->moveUP) playerVel->velocity.y = -speed;
     if (playerInp->moveDown) playerVel->velocity.y = speed;
     if (playerInp->moveRight) playerVel->velocity.x = speed;
     if (playerInp->moveLeft) playerVel->velocity.x = -speed;
-    if(playerInp->jump) playerVel->velocity.y += -50;
+    if(playerInp->jump)
+    {
+        playerVel->velocity.y += -20;
+    }
 }
 void MarioGame::SMovement()
 {
@@ -257,6 +302,10 @@ void MarioGame::SMovement()
                 if(tr->GetPos().x <= 0)
                 {
                     tr->SetPos(1 , tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
+                }
+                else if (tr->GetPos().x >= 1000)
+                {
+                    tr->SetPos(999 , tr->GetPos().y + vel->velocity.y + gravity->GetGravity());
                 }
                 else
                 {
@@ -472,6 +521,7 @@ void MarioGame::MoveCamera()
     auto playerTr = m_entityManager.GetComponent<CTransform>("player");
     auto offsetX = playerTr->GetPos().x - 100;
     if (offsetX < 0) offsetX = 0;
+    if(offsetX > 300) offsetX = 300;
     sf::View view(sf::FloatRect(0,0, 800, 600));
     view.move(offsetX,0);
     m_window.setView(view);
