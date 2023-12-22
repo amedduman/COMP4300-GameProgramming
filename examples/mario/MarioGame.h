@@ -16,12 +16,15 @@ private:
     void SpawnPlayer();
     void SpawnTiles();
     void SpawnBullet();
+    void SpawnLevelEndFlag();
+    void ResetGame();
     Vec2 RectVsRect(const std::shared_ptr<CBoundingBox>& rect1, const std::shared_ptr<CBoundingBox>& rect2, bool doForPreviousPos = false);
     void Reselotion();
     void Reselotion(std::shared_ptr<CBoundingBox> bb);
     void SyncShapeAndTransform();
     void SyncSpriteAndTransform();
     void MoveCamera();
+    void CheckFall();
 
     void SInput();
     void SCalculateVelocity();
@@ -37,4 +40,5 @@ private:
     sf::Texture hazardTex;
     sf::Texture bulletTex;
     sf::Texture specialTileTex;
+    sf::Texture flagTex;
 };

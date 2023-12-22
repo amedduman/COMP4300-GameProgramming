@@ -12,6 +12,7 @@ void MarioGame::Run()
 {
     SpawnPlayer();
     SpawnTiles();
+    SpawnLevelEndFlag();
 
     while (m_window.isOpen())
     {
@@ -22,6 +23,7 @@ void MarioGame::Run()
         SCalculateVelocity();
         // SApplyGravity();
         SMovement();
+        CheckFall();
         SDetectCollision();
         SAnimate();
         SyncShapeAndTransform();
@@ -202,6 +204,35 @@ void MarioGame::SpawnBullet()
     m_entityManager.AddComponent(std::make_shared<CBoundingBox>(bullet, Vec2(sizeY, sizeY)));
     m_entityManager.AddComponent(std::make_shared<CVelocity>(bullet, Vec2(10, 0)));
 }
+void MarioGame::SpawnLevelEndFlag()
+{
+    if (!flagTex.loadFromFile("../examples/mario/flag.png"))
+    {
+        std::cout << "error while loading image" << std::endl;
+    }
+    flagTex.setSmooth(true);
+
+    auto flag = m_entityManager.AddEntity("flag");
+    constexpr float sizeX = 25;
+    constexpr float sizeY = 155;
+    m_entityManager.AddComponent(std::make_shared<CTransform>(flag, Vec2(990, 400)));
+    m_entityManager.AddComponent(std::make_shared<CShape>(flag, sf::Vector2f(sizeX, sizeY), sf::Color::Transparent));
+    m_entityManager.AddComponent(std::make_shared<CBoundingBox>(flag, Vec2(sizeX, sizeY)));
+    m_entityManager.AddComponent(std::make_shared<CSprite>(flag, flagTex, sf::IntRect(0,0,32,96), Vec2(16,12)));
+}
+
+void MarioGame::ResetGame()
+{
+    for(auto& e : m_entityManager.GetEntities())
+    {
+        e->Destroy();
+    }
+
+    SpawnPlayer();
+    SpawnTiles();
+    SpawnLevelEndFlag();
+}
+
 void MarioGame::SInput()
 {
     sf::Event event {};
@@ -351,7 +382,7 @@ void MarioGame::SDetectCollision()
                 if (e->Tag() == "enemy")
                 {
                     e->Destroy();
-                    std::cout << "game over" << std::endl;
+                    ResetGame();
                 }
                 else if (e->Tag() == "special tile")
                 {
@@ -364,6 +395,10 @@ void MarioGame::SDetectCollision()
                     {
                         e->Destroy();
                     }
+                }
+                else if (e->Tag() == "flag")
+                {
+                    ResetGame();
                 }
                 else
                 {
@@ -525,4 +560,11 @@ void MarioGame::MoveCamera()
     sf::View view(sf::FloatRect(0,0, 800, 600));
     view.move(offsetX,0);
     m_window.setView(view);
+}
+
+void MarioGame::CheckFall()
+{
+    auto playerTr = m_entityManager.GetComponent<CTransform>("player");
+    if(playerTr->GetPos().y > 700)
+        ResetGame();
 }
