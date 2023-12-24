@@ -1,7 +1,7 @@
-#include "examples/mario/MarioGame.h"
+#include "dev/line_segment_intersection/LineSegmentIntersection.h"
 
 int main()
 {
-    MarioGame game;
-    game.Run();
+    LineSegmentIntersection l;
+    l.Run();
 }

@@ -10,7 +10,8 @@ file(GLOB_RECURSE ENGINE_FILES engine/*.cpp)
 
 add_executable(COMP4300 main.cpp ${ENGINE_FILES} ${EXAMPLE_FILES}
         examples/mario/MarioGame.cpp
-        examples/mario/MarioGame.h)
+        examples/mario/MarioGame.h
+        dev/line_segment_intersection/LineSegmentIntersection.h)
 
 find_package(SFML 2.5 COMPONENTS window graphics REQUIRED)
 target_link_libraries(COMP4300 sfml-window sfml-graphics)
