@@ -14,6 +14,31 @@ struct Intersect
     sf::Vector2f intersectionPoint;
 };
 
+void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>& rects)
+{
+    sf::RectangleShape rect1;
+    rect1.setSize(sf::Vector2f(100,100));
+    rect1.setPosition(500,300);
+    rect1.setOutlineThickness(1);
+    rect1.setFillColor(sf::Color::Transparent);
+
+    sf::RectangleShape rect2;
+    rect2.setSize(sf::Vector2f(100,100));
+    rect2.setPosition(100,300);
+    rect2.setOutlineThickness(1);
+    rect2.setFillColor(sf::Color::Transparent);
+
+    sf::RectangleShape screenBounds;
+    screenBounds.setSize(sf::Vector2f(window.getSize().x,window.getSize().y));
+    screenBounds.setPosition(0,0);
+    screenBounds.setOutlineThickness(1);
+    screenBounds.setFillColor(sf::Color::Transparent);
+
+    rects.push_back(rect1);
+    rects.push_back(rect2);
+    rects.push_back(screenBounds);
+}
+
 class LineSegmentIntersection
 {
 public:
@@ -22,8 +47,7 @@ public:
 
     LineSegmentIntersection()
         :m_window(sf::VideoMode(800, 600), "My window")
-    {
-    }
+    {}
     void Run()
     {
         //circle
@@ -45,28 +69,8 @@ public:
 
         // rects
         std::vector<sf::RectangleShape> rects;
+        SpawnRects(m_window, rects);
 
-        sf::RectangleShape rect1;
-        rect1.setSize(sf::Vector2f(100,100));
-        rect1.setPosition(500,300);
-        rect1.setOutlineThickness(1);
-        rect1.setFillColor(sf::Color::Transparent);
-
-        sf::RectangleShape rect2;
-        rect2.setSize(sf::Vector2f(100,100));
-        rect2.setPosition(100,300);
-        rect2.setOutlineThickness(1);
-        rect2.setFillColor(sf::Color::Transparent);
-
-        sf::RectangleShape screenBounds;
-        screenBounds.setSize(sf::Vector2f(m_window.getSize().x,m_window.getSize().y));
-        screenBounds.setPosition(0,0);
-        screenBounds.setOutlineThickness(1);
-        screenBounds.setFillColor(sf::Color::Transparent);
-
-        rects.push_back(rect1);
-        rects.push_back(rect2);
-        rects.push_back(screenBounds);
 
         while (m_window.isOpen())
         {
