@@ -82,7 +82,7 @@ private:
         float t = Cross(cma, s) / rxs;
         float u = Cross(cma, r) / rxs;
 
-        if(t >= 0 && t <= 1 && u >= 0 && t <= 1)
+        if(t >= 0 && t <= 1 && u >= 0 && u <= 1)
         {
             result.isIntersected = true;
             result.intersectionPoint = sf::Vector2f(a.x + t*r.x, a.y + t*r.y);
