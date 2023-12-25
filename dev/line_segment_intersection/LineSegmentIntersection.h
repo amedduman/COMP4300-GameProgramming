@@ -44,6 +44,49 @@ public:
             sf::Vertex(b2)
         };
 
+        sf::RectangleShape rect1;
+        rect1.setSize(sf::Vector2f(100,100));
+        rect1.setPosition(500,300);
+        rect1.setOutlineThickness(1);
+        rect1.setFillColor(sf::Color::Transparent);
+
+        sf::RectangleShape rect2;
+        rect2.setSize(sf::Vector2f(300,100));
+        rect2.setPosition(300,300);
+        rect2.setOutlineThickness(1);
+        rect2.setFillColor(sf::Color::Transparent);
+
+        /*
+        sf::Vector2f a = sf::Vector2f(rect.getPosition().x + rect.getPoint(0).x, rect.getPosition().y + rect.getPoint(0).y);
+        sf::Vector2f b= sf::Vector2f(rect.getPosition().x + rect.getPoint(1).x, rect.getPosition().y + rect.getPoint(1).y);
+        sf::Vector2f c= sf::Vector2f(rect.getPosition().x + rect.getPoint(2).x, rect.getPosition().y + rect.getPoint(2).y);
+        sf::Vector2f d= sf::Vector2f(rect.getPosition().x + rect.getPoint(3).x, rect.getPosition().y + rect.getPoint(3).y);
+        // std::cout << a.x << ", " << a.y << std::endl;
+        // std::cout << b.x << ", " << b.y << std::endl;
+        // std::cout << c.x << ", " << c.y << std::endl;
+        // std::cout << d.x << ", " << d.y << std::endl;
+        sf::Vertex ab[] =
+        {
+            sf::Vertex(a),
+            sf::Vertex(b),
+        };
+        sf::Vertex bc[] =
+        {
+            sf::Vertex(b),
+            sf::Vertex(c),
+        };
+        sf::Vertex cd[] =
+        {
+            sf::Vertex(c),
+            sf::Vertex(d),
+        };
+        sf::Vertex da[] =
+        {
+            sf::Vertex(d),
+            sf::Vertex(a),
+        };
+        */
+
         while (m_window.isOpen())
         {
             SInput();
@@ -52,7 +95,8 @@ public:
             b2.y = sf::Mouse::getPosition(m_window).y;
             lineB[1] = sf::Vertex(sf::Vector2f(b2));
 
-            auto intersectionResult = LineSegIntersect(a1, a2, b1, b2);
+            // auto intersectionResult = LineSegIntersect(a1, a2, b1, b2);
+            auto intersectionResult = LineVsRect(b1,b2, rect1);
             if (intersectionResult.isIntersected)
             {
                 circle.setPosition(intersectionResult.intersectionPoint);
@@ -60,11 +104,18 @@ public:
             else
                 circle.setPosition(sf::Vector2f(0,0));
 
+            // LineVsRect(b1,b2, rect);
+
             m_window.clear(sf::Color(25, 35,25));
 
             m_window.draw(lineA, 2, sf::Lines);
             m_window.draw(lineB, 2, sf::Lines);
             m_window.draw(circle);
+            m_window.draw(rect1);
+            // m_window.draw(ab, 4, sf::Lines);
+            // m_window.draw(bc, 4, sf::Lines);
+            // m_window.draw(cd, 4, sf::Lines);
+            // m_window.draw(da, 4, sf::Lines);
 
             m_window.display();
         }
@@ -128,6 +179,41 @@ private:
             result.intersectionPoint = intersect;
         }
 
+        return result;
+    }
+    LineIntersectionResult LineVsRect(sf::Vector2f p0, sf::Vector2f p1, sf::RectangleShape rect)
+    {
+        LineIntersectionResult result;
+        result.isIntersected = false;
+        result.intersectionPoint = sf::Vector2f(0,0);
+        sf::Vector2f a = sf::Vector2f(rect.getPosition().x + rect.getPoint(0).x, rect.getPosition().y + rect.getPoint(0).y);
+        sf::Vector2f b= sf::Vector2f(rect.getPosition().x + rect.getPoint(1).x, rect.getPosition().y + rect.getPoint(1).y);
+        sf::Vector2f c= sf::Vector2f(rect.getPosition().x + rect.getPoint(2).x, rect.getPosition().y + rect.getPoint(2).y);
+        sf::Vector2f d= sf::Vector2f(rect.getPosition().x + rect.getPoint(3).x, rect.getPosition().y + rect.getPoint(3).y);
+
+        // ab bc cd da
+        std::vector<sf::Vector2f> intersections;
+        auto i1 = LineSegIntersect(p0, p1, a, b);
+        auto i2 = LineSegIntersect(p0, p1, b, c);
+        auto i3 = LineSegIntersect(p0, p1, c, d);
+        auto i4 = LineSegIntersect(p0, p1, d, a);
+        if(i1.isIntersected) intersections.push_back(i1.intersectionPoint);
+        if(i2.isIntersected) intersections.push_back(i2.intersectionPoint);
+        if(i3.isIntersected) intersections.push_back(i3.intersectionPoint);
+        if(i4.isIntersected) intersections.push_back(i4.intersectionPoint);
+
+        float distanceSqr = 1000000;
+        for(auto& e: intersections)
+        {
+            auto vec = sf::Vector2f(e.x - p0.x, e.y - p0.y);
+            float vecSqr = vec.x * vec.x + vec.y * vec.y;
+            if(vecSqr < distanceSqr)
+            {
+                distanceSqr = vecSqr;
+                result.isIntersected = true;
+                result.intersectionPoint = e;
+            }
+        }
         return result;
     }
     void SRender()
