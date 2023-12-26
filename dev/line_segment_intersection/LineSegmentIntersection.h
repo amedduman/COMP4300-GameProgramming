@@ -18,6 +18,17 @@ struct Line
     sf::Vector2f p0 = sf::Vector2f(0,0);
     sf::Vector2f p1 = sf::Vector2f(0,0);
 };
+struct Circle
+{
+    sf::CircleShape shape;
+    Circle()
+    {
+        shape = sf::CircleShape(4);
+        shape.setOrigin(4,4);
+        shape.setFillColor(sf::Color::Transparent);
+        shape.setOutlineThickness(1);
+    }
+};
 
 void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>& rects)
 {
@@ -55,26 +66,7 @@ public:
     {}
     void Run()
     {
-        //circle
-        auto circle = sf::CircleShape(4);
-        circle.setOrigin(4,4);
-        circle.setFillColor(sf::Color::Transparent);
-        circle.setOutlineThickness(1);
-
-        // line
-        auto a1 = sf::Vector2f(400, 300);
-        auto a2 = sf::Vector2f(550, 150);
-        sf::Vertex line[] =
-        {
-            sf::Vertex(a1),
-            sf::Vertex(a2)
-        };
-        line[0].color = sf::Color::Red;
-        line[1].color = sf::Color::Red;
-
-        std::vector<Line> lines;
-        // lines.push_back(Line{sf::Vector2f(400,300), sf::Vector2f(0,0)});
-        // lines.push_back(Line{sf::Vector2f(400,300), sf::Vector2f(100,0)});
+        //circles
 
         // rects
         std::vector<sf::RectangleShape> rects;
@@ -83,17 +75,10 @@ public:
 
         while (m_window.isOpen())
         {
+            std::vector<Circle> circles;
+            std::vector<Line> lines;
+
             SInput();
-
-            a2.x = sf::Mouse::getPosition(m_window).x;
-            a2.y = sf::Mouse::getPosition(m_window).y;
-            line[1] = sf::Vertex(sf::Vector2f(a2));
-
-            // for(auto& e : lines)
-            // {
-            //     e.p0.x = sf::Mouse::getPosition(m_window).x;
-            //     e.p0.y = sf::Mouse::getPosition(m_window).y;
-            // }
 
             for(auto& e : rects)
             {
@@ -107,28 +92,28 @@ public:
                 }
             }
 
-            Intersect intersectionResult;
-            for(auto& e : rects)
+            for(auto& l : lines)
             {
-                intersectionResult = LineVsRect(a1,a2, e);
-                if (intersectionResult.isIntersected) break;
+                Intersect intersectionResult;
+                for(auto& e : rects)
+                {
+                    intersectionResult = LineVsRect(l.p0,l.p1, e);
+                    if (intersectionResult.isIntersected) break;
+                }
+                if (intersectionResult.isIntersected)
+                {
+                    auto c = Circle();
+                    c.shape.setPosition(intersectionResult.intersectionPoint);
+                    circles.push_back(c);
+                }
             }
-            if (intersectionResult.isIntersected)
-            {
-                circle.setPosition(intersectionResult.intersectionPoint);
-            }
-            else
-                circle.setPosition(sf::Vector2f(0,0));
 
             m_window.clear(sf::Color(25, 35,25));
 
-            m_window.draw(line, 2, sf::Lines);
-            m_window.draw(circle);
             for(auto& e : rects)
             {
                 m_window.draw(e);
             }
-
             for(auto& e : lines)
             {
                 sf::Vertex line[] =
@@ -138,9 +123,12 @@ public:
                 };
                 m_window.draw(line, 2, sf::Lines);
             }
+            for(auto& c : circles)
+            {
+                m_window.draw(c.shape);
+            }
 
             m_window.display();
-            lines.clear();
         }
     }
 private:
