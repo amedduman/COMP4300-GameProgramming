@@ -52,7 +52,7 @@ void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>&
 
     rects.push_back(rect1);
     rects.push_back(rect2);
-    // rects.push_back(screenBounds);
+    rects.push_back(screenBounds);
 }
 
 class LineSegmentIntersection
@@ -84,13 +84,15 @@ public:
                     Line line;
                     line.p0.x = sf::Mouse::getPosition(m_window).x;
                     line.p0.y = sf::Mouse::getPosition(m_window).y;
-                    line.p1 = e.getPoint(i) + e.getPosition();
+                    line.p1 += e.getPoint(i) + e.getPosition();
+                    auto dir = line.p1 - line.p0;
+                    line.p1 += sf::Vector2f(dir.x * 100, dir.y * 100);
                     lines.push_back(line);
 
                     Line l2;
                     l2.p0 = line.p0;
 
-                    float r1 = 0.01;
+                    float r1 = 0.001;
                     l2.p1.x = line.p1.x * cos(r1) - line.p1.y * sin(r1);
                     l2.p1.y = line.p1.x * sin(r1) + line.p1.y * cos(r1);
 
@@ -99,7 +101,7 @@ public:
                     Line l3;
                     l3.p0 = line.p0;
 
-                    float r2 = -0.01;
+                    float r2 = -r1;
                     l3.p1.x = line.p1.x * cos(r2) - line.p1.y * sin(r2);
                     l3.p1.y = line.p1.x * sin(r2) + line.p1.y * cos(r2);
 
