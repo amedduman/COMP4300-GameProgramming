@@ -13,6 +13,11 @@ struct Intersect
     bool isIntersected;
     sf::Vector2f intersectionPoint;
 };
+struct Line
+{
+    sf::Vector2f p0 = sf::Vector2f(0,0);
+    sf::Vector2f p1 = sf::Vector2f(0,0);
+};
 
 void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>& rects)
 {
@@ -67,6 +72,10 @@ public:
         line[0].color = sf::Color::Red;
         line[1].color = sf::Color::Red;
 
+        std::vector<Line> lines;
+        // lines.push_back(Line{sf::Vector2f(400,300), sf::Vector2f(0,0)});
+        // lines.push_back(Line{sf::Vector2f(400,300), sf::Vector2f(100,0)});
+
         // rects
         std::vector<sf::RectangleShape> rects;
         SpawnRects(m_window, rects);
@@ -79,6 +88,24 @@ public:
             a2.x = sf::Mouse::getPosition(m_window).x;
             a2.y = sf::Mouse::getPosition(m_window).y;
             line[1] = sf::Vertex(sf::Vector2f(a2));
+
+            // for(auto& e : lines)
+            // {
+            //     e.p0.x = sf::Mouse::getPosition(m_window).x;
+            //     e.p0.y = sf::Mouse::getPosition(m_window).y;
+            // }
+
+            for(auto& e : rects)
+            {
+                for (int i = 0; i < e.getPointCount(); ++i)
+                {
+                    Line line;
+                    line.p0.x = sf::Mouse::getPosition(m_window).x;
+                    line.p0.y = sf::Mouse::getPosition(m_window).y;
+                    line.p1 = e.getPoint(i) + e.getPosition();
+                    lines.push_back(line);
+                }
+            }
 
             Intersect intersectionResult;
             for(auto& e : rects)
@@ -102,7 +129,18 @@ public:
                 m_window.draw(e);
             }
 
+            for(auto& e : lines)
+            {
+                sf::Vertex line[] =
+                {
+                    sf::Vertex(e.p0),
+                    sf::Vertex(e.p1)
+                };
+                m_window.draw(line, 2, sf::Lines);
+            }
+
             m_window.display();
+            lines.clear();
         }
     }
 private:
