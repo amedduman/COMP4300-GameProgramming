@@ -74,7 +74,7 @@ void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>&
     rect2.setFillColor(sf::Color::Transparent);
 
     sf::RectangleShape screenBounds;
-    screenBounds.setSize(sf::Vector2f(window.getSize().x,window.getSize().y));
+    screenBounds.setSize(sf::Vector2f(window.getSize().x - 100,window.getSize().y - 100));
     screenBounds.setPosition(0,0);
     screenBounds.setOutlineThickness(1);
     screenBounds.setFillColor(sf::Color::Transparent);
@@ -89,6 +89,7 @@ class LineSegmentIntersection
 public:
     sf::RenderWindow m_window;
     EntityManager m_entityManager;
+    int debugCount = -1;
 
     LineSegmentIntersection()
         :m_window(sf::VideoMode(800, 600), "My window")
@@ -98,23 +99,17 @@ public:
         // rects
         std::vector<sf::RectangleShape> rects;
         SpawnRects(m_window, rects);
-        bool hasRan = false;
-
-        auto a = sf::Vector2f(100,0);
-        auto b = sf::Vector2f(-100, 0);
-        auto v1 = a - sf::Vector2f(0,0);
-        auto v2 = b - sf::Vector2f(0,0);
-        auto x = GetAngle(v1,v2);
-        std::cout << x << std::endl;
+        bool done = false;
+        std::vector<Circle> circles;
+        std::vector<Line> lines;
 
         while (m_window.isOpen())
         {
-            std::vector<Circle> circles;
-            std::vector<Line> lines;
 
             SInput();
-
-            // generate rays
+            if(done == false)
+            {
+                // generate rays
             for(auto& e : rects)
             {
                 for (int i = 0; i < e.getPointCount(); ++i)
@@ -135,7 +130,7 @@ public:
                     l2.p1.x = line.p1.x * cos(r1) - line.p1.y * sin(r1);
                     l2.p1.y = line.p1.x * sin(r1) + line.p1.y * cos(r1);
 
-                    lines.push_back(l2);
+                    // lines.push_back(l2);
 
                     Line l3;
                     l3.p0 = line.p0;
@@ -144,7 +139,7 @@ public:
                     l3.p1.x = line.p1.x * cos(r2) - line.p1.y * sin(r2);
                     l3.p1.y = line.p1.x * sin(r2) + line.p1.y * cos(r2);
 
-                    lines.push_back(l3);
+                    // lines.push_back(l3);
                 }
             }
 
@@ -166,7 +161,12 @@ public:
             }
 
             // sort points
-            auto rightVec = sf::Vector2f(1,0);
+            auto rightVec = sf::Vector2f(sf::Mouse::getPosition(m_window).x + 100, sf::Mouse::getPosition(m_window).y);
+            sf::Vertex dirline[] =
+                {
+                sf::Vertex(sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y)),
+                sf::Vertex(sf::Vector2f(sf::Mouse::getPosition(m_window).x + 100, sf::Mouse::getPosition(m_window).y))
+            };
             for (int j = 0; j < circles.size(); ++j)
             {
                 int indexOfSmallest = 0;
@@ -188,14 +188,41 @@ public:
                 circles[indexOfSmallest] = tmp;
             }
 
+            sf::Font font;
+            if (!font.loadFromFile("CotaneBeach.otf"))
+            {
+                // error...
+            }
+            std::vector<sf::Text> texts;
+
+
             // generate light mesh
-            int vertexCount = circles.size() + 1;
+            int vertexCount = circles.size() + 2;
             sf::VertexArray lightMesh(sf::TrianglesFan, vertexCount);
             lightMesh[0] = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
             for (int i = 0; i < circles.size(); ++i)
             {
                 lightMesh[i + 1] = circles[i].shape.getPosition();
+
+                sf::Text text;
+                text.setFont(font);
+                text.setString(std::to_string(i));
+                text.setCharacterSize(12);
+                text.setPosition(circles[i].shape.getPosition());
+                text.setColor(sf::Color::Red);
+                texts.push_back(text);
             }
+                done = true;
+            }
+
+
+            // lightMesh[circles.size() + 1] = circles[0].shape.getPosition();
+
+            if(debugCount >= 0)
+            {
+                circles[debugCount].shape.setFillColor(sf::Color::Red);
+            }
+
 
             m_window.clear(sf::Color(25, 35,25));
 
@@ -216,8 +243,15 @@ public:
             {
                 m_window.draw(c.shape);
             }
-            m_window.draw(lightMesh);
+            // m_window.draw(lightMesh);
+            // for(auto& e : texts)
+            // {
+            //     // m_window.draw(e);
+            // }
+//
 
+            // m_window.draw(dirline, 2, sf::Lines);
+//
             m_window.display();
         }
     }
@@ -301,6 +335,14 @@ private:
                 if(event.key.code == sf::Keyboard::Escape)
                 {
                     m_window.close();
+                }
+                if(event.key.code == sf::Keyboard::Escape)
+                {
+                    m_window.close();
+                }
+                if(event.key.code == sf::Keyboard::Space)
+                {
+                    debugCount++;
                 }
             }
             if (event.type == sf::Event::KeyReleased)
