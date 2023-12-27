@@ -142,7 +142,6 @@ public:
                 for (int i = j; i < circles.size(); ++i)
                 {
                     auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
-                    auto dir = circles[i].shape.getPosition() - mousePos;
                     auto currentAngle = CalculateAngle(circles[i].shape.getPosition(), mousePos);
                     if (currentAngle < lastAngle)
                     {
@@ -156,14 +155,6 @@ public:
                 circles[indexOfSmallest] = tmp;
             }
 
-            sf::Font font;
-            if (!font.loadFromFile("CotaneBeach.otf"))
-            {
-                // error...
-            }
-            std::vector<sf::Text> texts;
-
-
             // generate light mesh
             int vertexCount = circles.size() + 2;
             sf::VertexArray lightMesh(sf::TrianglesFan, vertexCount);
@@ -171,16 +162,7 @@ public:
             for (int i = 0; i < circles.size(); ++i)
             {
                 lightMesh[i + 1] = circles[i].shape.getPosition();
-
-                sf::Text text;
-                text.setFont(font);
-                text.setString(std::to_string(i));
-                text.setCharacterSize(12);
-                text.setPosition(circles[i].shape.getPosition());
-                text.setColor(sf::Color::Red);
-                texts.push_back(text);
             }
-
 
             lightMesh[circles.size() + 1] = circles[0].shape.getPosition();
 
@@ -204,11 +186,7 @@ public:
             {
                 m_window.draw(c.shape);
             }
-            // m_window.draw(lightMesh);
-            for(auto& e : texts)
-            {
-                // m_window.draw(e);
-            }
+            m_window.draw(lightMesh);
 
             m_window.display();
         }
