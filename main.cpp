@@ -3,8 +3,8 @@
 
 int main()
 {
-    // LineSegmentIntersection l;
-    // l.Run();
-    SortingTest s;
-    s.Run();
+    LineSegmentIntersection l;
+    l.Run();
+    // SortingTest s;
+    // s.Run();
 }

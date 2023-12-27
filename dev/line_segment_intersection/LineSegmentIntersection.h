@@ -30,33 +30,11 @@ struct Circle
     }
 };
 
-float DotProduct(sf::Vector2f a, sf::Vector2f b)
+float CalculateAngle(const sf::Vector2f point, const sf::Vector2f center)
 {
-    return a.x * b.x + a.y * b.y;
-}
-float Magnitude(sf::Vector2f a)
-{
-    return sqrt(a.x * a.x + a.y * a.y);
-}
-sf::Vector2f Normalize(sf::Vector2f a)
-{
-    float mag = Magnitude(a);
-    return sf::Vector2f(a.x/mag, a.y/mag);
-}
-float GetAngle(sf::Vector2f in_a, sf::Vector2f in_b)
-{
-    sf::Vector2f a = Normalize(in_a);
-    sf::Vector2f b = Normalize(in_b);
-
-    float dot = DotProduct(a,b);
-    float mag_a = Magnitude(a);
-    float mag_b = Magnitude(b);
-
-    float cosValue = dot / mag_a * mag_b;
-
-    float radians = acos(cosValue);
-    float degrees = radians * (180.0 / M_PI);
-    return degrees;
+    float dx = point.x - center.x;
+    float dy = point.y - center.y;
+    return std::atan2(dy, dx) * (180.0 / M_PI);
 }
 
 void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>& rects)
@@ -89,7 +67,6 @@ class LineSegmentIntersection
 public:
     sf::RenderWindow m_window;
     EntityManager m_entityManager;
-    int debugCount = -1;
 
     LineSegmentIntersection()
         :m_window(sf::VideoMode(800, 600), "My window")
@@ -99,17 +76,14 @@ public:
         // rects
         std::vector<sf::RectangleShape> rects;
         SpawnRects(m_window, rects);
-        bool done = false;
-        std::vector<Circle> circles;
-        std::vector<Line> lines;
 
         while (m_window.isOpen())
         {
-
+            std::vector<Circle> circles;
+            std::vector<Line> lines;
             SInput();
-            if(done == false)
-            {
-                // generate rays
+
+            // generate rays
             for(auto& e : rects)
             {
                 for (int i = 0; i < e.getPointCount(); ++i)
@@ -130,7 +104,7 @@ public:
                     l2.p1.x = line.p1.x * cos(r1) - line.p1.y * sin(r1);
                     l2.p1.y = line.p1.x * sin(r1) + line.p1.y * cos(r1);
 
-                    // lines.push_back(l2);
+                    lines.push_back(l2);
 
                     Line l3;
                     l3.p0 = line.p0;
@@ -139,7 +113,7 @@ public:
                     l3.p1.x = line.p1.x * cos(r2) - line.p1.y * sin(r2);
                     l3.p1.y = line.p1.x * sin(r2) + line.p1.y * cos(r2);
 
-                    // lines.push_back(l3);
+                    lines.push_back(l3);
                 }
             }
 
@@ -161,12 +135,6 @@ public:
             }
 
             // sort points
-            auto rightVec = sf::Vector2f(sf::Mouse::getPosition(m_window).x + 100, sf::Mouse::getPosition(m_window).y);
-            sf::Vertex dirline[] =
-                {
-                sf::Vertex(sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y)),
-                sf::Vertex(sf::Vector2f(sf::Mouse::getPosition(m_window).x + 100, sf::Mouse::getPosition(m_window).y))
-            };
             for (int j = 0; j < circles.size(); ++j)
             {
                 int indexOfSmallest = 0;
@@ -175,7 +143,7 @@ public:
                 {
                     auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
                     auto dir = circles[i].shape.getPosition() - mousePos;
-                    auto currentAngle = GetAngle(rightVec, dir);
+                    auto currentAngle = CalculateAngle(circles[i].shape.getPosition(), mousePos);
                     if (currentAngle < lastAngle)
                     {
                         lastAngle = currentAngle;
@@ -212,16 +180,9 @@ public:
                 text.setColor(sf::Color::Red);
                 texts.push_back(text);
             }
-                done = true;
-            }
 
 
-            // lightMesh[circles.size() + 1] = circles[0].shape.getPosition();
-
-            if(debugCount >= 0)
-            {
-                circles[debugCount].shape.setFillColor(sf::Color::Red);
-            }
+            lightMesh[circles.size() + 1] = circles[0].shape.getPosition();
 
 
             m_window.clear(sf::Color(25, 35,25));
@@ -244,14 +205,11 @@ public:
                 m_window.draw(c.shape);
             }
             // m_window.draw(lightMesh);
-            // for(auto& e : texts)
-            // {
-            //     // m_window.draw(e);
-            // }
-//
+            for(auto& e : texts)
+            {
+                // m_window.draw(e);
+            }
 
-            // m_window.draw(dirline, 2, sf::Lines);
-//
             m_window.display();
         }
     }
@@ -339,10 +297,6 @@ private:
                 if(event.key.code == sf::Keyboard::Escape)
                 {
                     m_window.close();
-                }
-                if(event.key.code == sf::Keyboard::Space)
-                {
-                    debugCount++;
                 }
             }
             if (event.type == sf::Event::KeyReleased)
