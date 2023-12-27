@@ -98,6 +98,7 @@ public:
         // rects
         std::vector<sf::RectangleShape> rects;
         SpawnRects(m_window, rects);
+        bool hasRan = false;
 
         auto a = sf::Vector2f(100,0);
         auto b = sf::Vector2f(-100, 0);
@@ -160,38 +161,72 @@ public:
                     circles.push_back(c);
                 }
             }
+            int count = 0;
 
             std::vector<sf::Vector2f> points;
             auto rightVec = sf::Vector2f(1,0);
             for (int j = 0; j < circles.size(); ++j)
             {
                 float lastAngle = 999;
+                int index = 0;
                 for (int i = 0; i < circles.size(); ++i)
                 {
-                    // write angle between each line
                     auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
                     auto dir = circles[i].shape.getPosition() - mousePos;
-                    auto c_radian = GetAngle(rightVec, dir);
-                    std::cout << c_radian << std::endl;
-                    if (c_radian < lastAngle)
+                    auto currentAngle = GetAngle(rightVec, dir);
+                    if (currentAngle < lastAngle)
                     {
+                        count++;
 
-                        lastAngle = c_radian;
-                        points.push_back(circles[i].shape.getPosition());
+                        lastAngle = currentAngle;
+                        index = i;
                     }
                 }
+                points.push_back(circles[index].shape.getPosition());
             }
+    //
+            if (hasRan == false)
+            {
 
+                for (int j = 0; j < circles.size(); ++j)
+                {
+                    int indexOfSmallest = 0;
+                    float lastAngle = 999;
+                    for (int i = j; i < circles.size(); ++i)
+                    {
+                        auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
+                        auto dir = circles[i].shape.getPosition() - mousePos;
+                        auto currentAngle = GetAngle(rightVec, dir);
+                        if (currentAngle < lastAngle)
+                        {
+                            lastAngle = currentAngle;
+                            indexOfSmallest = i;
+                        }
+                    }
+                    Circle tmp;
+                    tmp = circles[j];
+                    circles[j] = circles[indexOfSmallest];
+                    circles[indexOfSmallest] = tmp;
+                    std::cout << lastAngle << std::endl;
 
+                }
 
+                hasRan = true;
 
-            // int vertexCount = circles.size() + 1;
-            // sf::VertexArray lightMesh(sf::TrianglesFan, vertexCount);
-            // lightMesh[0] = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
-            // for (int i = 1; i < circles.size(); ++i)
-            // {
-            //     lightMesh[i] = points[i];
-            // }
+                for (auto& e : circles)
+                {
+                    // std::cout << e.shape.getPosition().x << ", " << e.shape.getPosition().y << std::endl;
+                 }
+            }
+//
+
+            int vertexCount = circles.size() + 1;
+            sf::VertexArray lightMesh(sf::TrianglesFan, vertexCount);
+            lightMesh[0] = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
+            for (int i = 1; i < circles.size(); ++i)
+            {
+                lightMesh[i] = points[i];
+            }
 
             m_window.clear(sf::Color(25, 35,25));
 
@@ -212,7 +247,7 @@ public:
             {
                 m_window.draw(c.shape);
             }
-            // m_window.draw(lightMesh);
+            m_window.draw(lightMesh);
 
             m_window.display();
         }
