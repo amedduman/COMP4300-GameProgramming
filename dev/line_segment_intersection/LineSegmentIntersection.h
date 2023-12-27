@@ -114,6 +114,7 @@ public:
 
             SInput();
 
+            // generate rays
             for(auto& e : rects)
             {
                 for (int i = 0; i < e.getPointCount(); ++i)
@@ -123,6 +124,7 @@ public:
                     line.p0.y = sf::Mouse::getPosition(m_window).y;
                     line.p1 += e.getPoint(i) + e.getPosition();
                     auto dir = line.p1 - line.p0;
+                    // extend rays to be long enough to cross with screen boundries
                     line.p1 += sf::Vector2f(dir.x * 100, dir.y * 100);
                     lines.push_back(line);
 
@@ -146,6 +148,7 @@ public:
                 }
             }
 
+            // generate intersection points
             for(auto& l : lines)
             {
                 Intersect intersectionResult;
@@ -161,71 +164,37 @@ public:
                     circles.push_back(c);
                 }
             }
-            int count = 0;
 
-            std::vector<sf::Vector2f> points;
+            // sort points
             auto rightVec = sf::Vector2f(1,0);
             for (int j = 0; j < circles.size(); ++j)
             {
+                int indexOfSmallest = 0;
                 float lastAngle = 999;
-                int index = 0;
-                for (int i = 0; i < circles.size(); ++i)
+                for (int i = j; i < circles.size(); ++i)
                 {
                     auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
                     auto dir = circles[i].shape.getPosition() - mousePos;
                     auto currentAngle = GetAngle(rightVec, dir);
                     if (currentAngle < lastAngle)
                     {
-                        count++;
-
                         lastAngle = currentAngle;
-                        index = i;
+                        indexOfSmallest = i;
                     }
                 }
-                points.push_back(circles[index].shape.getPosition());
+                Circle tmp;
+                tmp = circles[j];
+                circles[j] = circles[indexOfSmallest];
+                circles[indexOfSmallest] = tmp;
             }
-    //
-            if (hasRan == false)
-            {
 
-                for (int j = 0; j < circles.size(); ++j)
-                {
-                    int indexOfSmallest = 0;
-                    float lastAngle = 999;
-                    for (int i = j; i < circles.size(); ++i)
-                    {
-                        auto mousePos = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
-                        auto dir = circles[i].shape.getPosition() - mousePos;
-                        auto currentAngle = GetAngle(rightVec, dir);
-                        if (currentAngle < lastAngle)
-                        {
-                            lastAngle = currentAngle;
-                            indexOfSmallest = i;
-                        }
-                    }
-                    Circle tmp;
-                    tmp = circles[j];
-                    circles[j] = circles[indexOfSmallest];
-                    circles[indexOfSmallest] = tmp;
-                    std::cout << lastAngle << std::endl;
-
-                }
-
-                hasRan = true;
-
-                for (auto& e : circles)
-                {
-                    // std::cout << e.shape.getPosition().x << ", " << e.shape.getPosition().y << std::endl;
-                 }
-            }
-//
-
+            // generate light mesh
             int vertexCount = circles.size() + 1;
             sf::VertexArray lightMesh(sf::TrianglesFan, vertexCount);
             lightMesh[0] = sf::Vector2f(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
-            for (int i = 1; i < circles.size(); ++i)
+            for (int i = 0; i < circles.size(); ++i)
             {
-                lightMesh[i] = points[i];
+                lightMesh[i + 1] = circles[i].shape.getPosition();
             }
 
             m_window.clear(sf::Color(25, 35,25));
