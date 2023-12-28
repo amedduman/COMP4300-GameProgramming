@@ -51,14 +51,22 @@ void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>&
     rect2.setOutlineThickness(1);
     rect2.setFillColor(sf::Color::Transparent);
 
+    sf::RectangleShape rect3;
+    rect3.setSize(sf::Vector2f(100,100));
+    rect3.setPosition(200,150);
+    rect3.setOutlineThickness(1);
+    rect3.setFillColor(sf::Color::Transparent);
+
     sf::RectangleShape screenBounds;
-    screenBounds.setSize(sf::Vector2f(window.getSize().x - 100,window.getSize().y - 100));
+    screenBounds.setSize(sf::Vector2f(window.getSize().x,window.getSize().y));
     screenBounds.setPosition(0,0);
     screenBounds.setOutlineThickness(1);
     screenBounds.setFillColor(sf::Color::Transparent);
 
-    rects.push_back(rect1);
     rects.push_back(rect2);
+    rects.push_back(rect1);
+
+    rects.push_back(rect3);
     rects.push_back(screenBounds);
 }
 
@@ -121,10 +129,18 @@ public:
             for(auto& l : lines)
             {
                 Intersect intersectionResult;
+                float minDistance = 10000000;
                 for(auto& e : rects)
                 {
-                    intersectionResult = LineVsRect(l.p0,l.p1, e);
-                    if (intersectionResult.isIntersected) break;
+                    auto tempIntersectionResult = LineVsRect(l.p0,l.p1, e);
+                    if (tempIntersectionResult.isIntersected)
+                    {
+                        if(distance(tempIntersectionResult.intersectionPoint, l.p0) < minDistance)
+                        {
+                            intersectionResult = tempIntersectionResult;
+                            minDistance = distance(tempIntersectionResult.intersectionPoint, l.p0);
+                        }
+                    }
                 }
                 if (intersectionResult.isIntersected)
                 {
@@ -192,7 +208,7 @@ public:
         }
     }
 private:
-    Intersect LineVsRect(sf::Vector2f p0, sf::Vector2f p1, sf::RectangleShape rect)
+    Intersect LineVsRect(sf::Vector2f p0, sf::Vector2f p1, const sf::RectangleShape& rect)
     {
         Intersect result;
         result.isIntersected = false;
@@ -213,19 +229,23 @@ private:
         if(i3.isIntersected) intersections.push_back(i3.intersectionPoint);
         if(i4.isIntersected) intersections.push_back(i4.intersectionPoint);
 
-        float distanceSqr = 1000000;
-        for(auto& e: intersections)
+        float minDistance = 10000000;
+        for(auto& intersection: intersections)
         {
-            auto vec = sf::Vector2f(e.x - p0.x, e.y - p0.y);
-            float vecSqr = vec.x * vec.x + vec.y * vec.y;
-            if(vecSqr < distanceSqr)
+            const float dist = distance(p0, intersection);
+            if(dist < minDistance)
             {
-                distanceSqr = vecSqr;
+                minDistance = dist;
                 result.isIntersected = true;
-                result.intersectionPoint = e;
+                result.intersectionPoint = intersection;
             }
         }
         return result;
+    }
+
+    float distance(const sf::Vector2f& p1, const sf::Vector2f& p2)
+    {
+        return std::sqrt(std::pow(p1.x - p2.x, 2) + std::pow(p1.y - p2.y, 2));
     }
 
     Intersect LineSegIntersect(sf::Vector2f a, sf::Vector2f b, sf::Vector2f c, sf::Vector2f d)
