@@ -52,10 +52,16 @@ void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>&
     rect2.setFillColor(sf::Color::Transparent);
 
     sf::RectangleShape rect3;
-    rect3.setSize(sf::Vector2f(100,100));
-    rect3.setPosition(200,150);
+    rect3.setSize(sf::Vector2f(200,100));
+    rect3.setPosition(300,150);
     rect3.setOutlineThickness(1);
     rect3.setFillColor(sf::Color::Transparent);
+
+    sf::RectangleShape rect4;
+    rect4.setSize(sf::Vector2f(200,200));
+    rect4.setPosition(250,350);
+    rect4.setOutlineThickness(1);
+    rect4.setFillColor(sf::Color::Transparent);
 
     sf::RectangleShape screenBounds;
     screenBounds.setSize(sf::Vector2f(window.getSize().x,window.getSize().y));
@@ -65,8 +71,8 @@ void SpawnRects(const sf::RenderWindow& window, std::vector<sf::RectangleShape>&
 
     rects.push_back(rect2);
     rects.push_back(rect1);
-
     rects.push_back(rect3);
+    rects.push_back(rect4);
     rects.push_back(screenBounds);
 }
 
@@ -85,11 +91,18 @@ public:
         std::vector<sf::RectangleShape> rects;
         SpawnRects(m_window, rects);
 
+        auto light = sf::CircleShape(20);
+        light.setOrigin(20,20);
+        light.setFillColor(sf::Color::Yellow);
+        light.setOutlineThickness(1);
+
         while (m_window.isOpen())
         {
             std::vector<Circle> circles;
             std::vector<Line> lines;
             SInput();
+
+            light.setPosition(sf::Mouse::getPosition(m_window).x,sf::Mouse::getPosition(m_window).y);
 
             // generate rays
             for(auto& e : rects)
@@ -182,8 +195,12 @@ public:
 
             lightMesh[circles.size() + 1] = circles[0].shape.getPosition();
 
+            for (int i = 0; i < lightMesh.getVertexCount(); ++i)
+            {
+                lightMesh[i].color = sf::Color(200,200,0);
+            }
 
-            m_window.clear(sf::Color(25, 35,25));
+            m_window.clear(sf::Color(25, 25,0));
 
             for(auto& e : rects)
             {
@@ -196,14 +213,14 @@ public:
                     sf::Vertex(e.p0),
                     sf::Vertex(e.p1)
                 };
-                m_window.draw(line, 2, sf::Lines);
+                // m_window.draw(line, 2, sf::Lines);
             }
             for(auto& c : circles)
             {
-                m_window.draw(c.shape);
+                // m_window.draw(c.shape);
             }
             m_window.draw(lightMesh);
-
+            m_window.draw(light);
             m_window.display();
         }
     }
